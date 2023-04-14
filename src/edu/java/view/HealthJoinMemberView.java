@@ -25,6 +25,7 @@ public class HealthJoinMemberView {
 	private JTextField textPassword;
 	private JTextField textPasswordCheck;
 	private final ButtonGroup buttonGroupMember = new ButtonGroup();
+	private JTextField textPhone;
 
 	/**
 	 * Launch the application.
@@ -98,59 +99,70 @@ public class HealthJoinMemberView {
 		
 		JLabel lblId = new JLabel("ID");
 		lblId.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		lblId.setBounds(32, 310, 112, 36);
+		lblId.setBounds(32, 342, 112, 36);
 		frame.getContentPane().add(lblId);
 		
 		textId = new JTextField();
 		textId.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		textId.setColumns(10);
-		textId.setBounds(156, 310, 251, 36);
+		textId.setBounds(156, 342, 251, 36);
 		frame.getContentPane().add(textId);
 		
 		JLabel lblMember = new JLabel("구분");
 		lblMember.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		lblMember.setBounds(32, 260, 112, 36);
+		lblMember.setBounds(32, 292, 112, 36);
 		frame.getContentPane().add(lblMember);
 		
 		JRadioButton radioMember1 = new JRadioButton("트레이너");
 		buttonGroupMember.add(radioMember1);
 		radioMember1.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		radioMember1.setBackground(Color.LIGHT_GRAY);
-		radioMember1.setBounds(158, 260, 116, 36);
+		radioMember1.setBounds(158, 292, 116, 36);
 		frame.getContentPane().add(radioMember1);
 		
 		JRadioButton radioMember2 = new JRadioButton("회원");
 		buttonGroupMember.add(radioMember2);
 		radioMember2.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		radioMember2.setBackground(Color.LIGHT_GRAY);
-		radioMember2.setBounds(292, 261, 90, 36);
+		radioMember2.setBounds(292, 293, 90, 36);
 		frame.getContentPane().add(radioMember2);
 		
 		JLabel lblPassword = new JLabel("비밀번호");
 		lblPassword.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		lblPassword.setBounds(32, 361, 112, 36);
+		lblPassword.setBounds(32, 393, 112, 36);
 		frame.getContentPane().add(lblPassword);
 		
 		textPassword = new JTextField();
 		textPassword.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		textPassword.setColumns(10);
-		textPassword.setBounds(156, 361, 251, 36);
+		textPassword.setBounds(156, 393, 251, 36);
 		frame.getContentPane().add(textPassword);
 		
 		JLabel lblPasswordCheck = new JLabel("비밀번호 확인");
 		lblPasswordCheck.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		lblPasswordCheck.setBounds(32, 415, 112, 36);
+		lblPasswordCheck.setBounds(32, 447, 112, 36);
 		frame.getContentPane().add(lblPasswordCheck);
 		
 		textPasswordCheck = new JTextField();
 		textPasswordCheck.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		textPasswordCheck.setColumns(10);
-		textPasswordCheck.setBounds(156, 415, 251, 36);
+		textPasswordCheck.setBounds(156, 447, 251, 36);
 		frame.getContentPane().add(textPasswordCheck);
 		
 		JButton btnJoin = new JButton("가입");
 		btnJoin.setFont(new Font("D2Coding", Font.BOLD, 17));
 		btnJoin.setBounds(167, 513, 100, 36);
 		frame.getContentPane().add(btnJoin);
+		
+		JLabel lblPhone = new JLabel("전화번호");
+		lblPhone.setFont(new Font("D2Coding", Font.PLAIN, 17));
+		lblPhone.setBounds(32, 246, 112, 36);
+		frame.getContentPane().add(lblPhone);
+		
+		textPhone = new JTextField();
+		textPhone.setFont(new Font("D2Coding", Font.PLAIN, 17));
+		textPhone.setColumns(10);
+		textPhone.setBounds(156, 246, 251, 36);
+		frame.getContentPane().add(textPhone);
 	}
 }
