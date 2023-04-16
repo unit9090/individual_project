@@ -5,35 +5,43 @@ import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import java.awt.Color;
+import java.awt.Component;
+
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.event.AncestorEvent;
 
-public class HealthLoginView {
+public class LoginView {
 
 	private JFrame frame;
-	private JLabel lblImage;
 	private JLabel lblId;
 	private JTextField textId;
 	private JTextField textPwd;
-	private JButton btnCreate;
 	private JLabel lblPwd;
 	private JButton btnLogin;
 	private JButton btnFindPwd;
+	
+	private Component parent;
+	private static int count = 0;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void showLoginView(Component parent) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					HealthLoginView window = new HealthLoginView();
+					LoginView window = new LoginView(parent);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -45,7 +53,8 @@ public class HealthLoginView {
 	/**
 	 * Create the application.
 	 */
-	public HealthLoginView() {
+	public LoginView(Component parent) {
+		this.parent = parent;
 		initialize();
 	}
 
@@ -56,13 +65,15 @@ public class HealthLoginView {
 		frame = new JFrame();
 		frame.setTitle("운동 기록");
 		frame.getContentPane().setBackground(Color.LIGHT_GRAY);
-		frame.setBounds(100, 100, 451, 659);
+		int x = 100;
+		int y = 100;
+		if(parent != null) {
+			x = parent.getX();
+			y = parent.getY();
+		}		
+		frame.setBounds(x, y, 451, 659);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
-		
-		lblImage = new JLabel(new ImageIcon("images/login_image.png"));
-		lblImage.setBounds(89, 122, 256, 256);
-		frame.getContentPane().add(lblImage);
 		
 		JLabel lblTitle = new JLabel("운동 기록");
 		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
@@ -103,14 +114,33 @@ public class HealthLoginView {
 		btnLogin.setBounds(303, 411, 83, 60);
 		frame.getContentPane().add(btnLogin);
 		
-		btnCreate = new JButton("회원가입");
-		btnCreate.setFont(new Font("D2Coding", Font.BOLD, 15));
-		btnCreate.setBounds(326, 574, 97, 36);
-		frame.getContentPane().add(btnCreate);
-		
 		btnFindPwd = new JButton("비밀번호 찾기");
 		btnFindPwd.setFont(new Font("D2Coding", Font.BOLD, 15));
-		btnFindPwd.setBounds(12, 574, 148, 36);
+		btnFindPwd.setBounds(238, 481, 148, 36);
 		frame.getContentPane().add(btnFindPwd);
+		
+		JButton btnJoin = new JButton(new ImageIcon("images/login_image.png"));
+		btnJoin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				count++;
+				if(count == 10) {
+					System.out.println("야호");
+					System.out.println(count);
+					count = 0;
+					frame.setVisible(false);
+					JoinView.showJoinView(frame);
+				}
+			}
+		});
+		btnJoin.setBounds(89, 122, 256, 256);
+		// JButton의 외곽선을 없앰
+		btnJoin.setBorderPainted(false);
+		// JButton의 내용영역 채우지 않음
+		btnJoin.setContentAreaFilled(false);
+		// JButton이 선택되었을 때 생기는 테두리 사용 안함.
+		btnJoin.setFocusPainted(false);
+		frame.getContentPane().add(btnJoin);
 	}
+	
+	
 }

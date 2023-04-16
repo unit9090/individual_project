@@ -5,6 +5,8 @@ import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import java.awt.Color;
+import java.awt.Component;
+
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -12,11 +14,13 @@ import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 
-public class HealthJoinMemberView {
+public class JoinView {
 
 	private JFrame frame;
 	private JTextField textName;
@@ -26,15 +30,17 @@ public class HealthJoinMemberView {
 	private JTextField textPasswordCheck;
 	private final ButtonGroup buttonGroupMember = new ButtonGroup();
 	private JTextField textPhone;
+	
+	private Component parent;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void showJoinView (Component parent) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					HealthJoinMemberView window = new HealthJoinMemberView();
+					JoinView window = new JoinView(parent);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -46,7 +52,8 @@ public class HealthJoinMemberView {
 	/**
 	 * Create the application.
 	 */
-	public HealthJoinMemberView() {
+	public JoinView(Component parent) {
+		this.parent = parent;
 		initialize();
 	}
 
@@ -57,8 +64,20 @@ public class HealthJoinMemberView {
 		frame = new JFrame();
 		frame.setTitle("회원가입");
 		frame.getContentPane().setBackground(Color.LIGHT_GRAY);
-		frame.setBounds(100, 100, 451, 659);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		int x = 100;
+		int y = 100;
+		if(parent != null) {
+			x = parent.getX();
+			y = parent.getY();
+		}		
+		frame.setBounds(x, y, 451, 659);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				frame.setVisible(false);
+				LoginView.showLoginView(frame);
+			}
+		});
+		
 		frame.getContentPane().setLayout(null);
 		
 		JLabel lblTitle = new JLabel("회원가입");
