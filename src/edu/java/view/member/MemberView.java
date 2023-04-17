@@ -51,7 +51,6 @@ public class MemberView {
 	// 테이블 컬럼 이름
 	private static final String[] PT_COLUMN_NAMES = {"날짜", "제목", "작성자"};
 	private DefaultTableModel modelPt;
-	private JTable tablePt;
 	private JScrollPane scrollPanePt;
 	private JButton btnLogout;
 	private JPanel diaryBtnPanel;
@@ -71,6 +70,9 @@ public class MemberView {
 	private Component verticalStrut;
 	private Component verticalStrut_1;
 	private Component verticalStrut_2;
+	private JLabel lblPhone;
+	private JLabel showPhone;
+	private JTable table;
 	
 
 	/**
@@ -139,6 +141,16 @@ public class MemberView {
 		tabbedPane.addTab("PT 일지", panePT());		
 		// 마이페이지
 		tabbedPane.addTab("마이페이지", paneMyPage());
+		
+		lblPhone = new JLabel("전화번호");
+		lblPhone.setFont(new Font("D2Coding", Font.PLAIN, 17));
+		lblPhone.setBounds(12, 377, 96, 25);
+		paneMyPage.add(lblPhone);
+		
+		showPhone = new JLabel("010-2222-2222");
+		showPhone.setFont(new Font("D2Coding", Font.PLAIN, 17));
+		showPhone.setBounds(120, 377, 166, 25);
+		paneMyPage.add(showPhone);
 	}
 	
 	// 다이어리
@@ -234,16 +246,11 @@ public class MemberView {
 		scrollPanePt = new JScrollPane();
 		panel.add(scrollPanePt, BorderLayout.CENTER);
 		
-		tablePt = new JTable();
+		table = new JTable();
 		modelPt = new DefaultTableModel(null, PT_COLUMN_NAMES);
-		tablePt.setModel(modelPt);
-		tablePt.getColumnModel().getColumn(0).setPreferredWidth(80);
-		tablePt.getColumnModel().getColumn(0).setMinWidth(20);
-		tablePt.getColumnModel().getColumn(1).setPreferredWidth(120);
-		tablePt.getColumnModel().getColumn(1).setMinWidth(20);
-		tablePt.getColumnModel().getColumn(2).setMinWidth(20);
-		tablePt.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		panel.add(tablePt, BorderLayout.CENTER);
+		table.setModel(modelPt);
+		table.setFont(new Font("D2Coding", Font.PLAIN, 17));
+		scrollPanePt.setViewportView(table);
 		
 		return panePT;
 	}

@@ -17,6 +17,8 @@ public class MemberTrainerInfoFrame extends JFrame {
 	private JLabel showName;
 	private JLabel showGender;
 	private JLabel showPhone;
+	private JLabel lblEmail;
+	private JLabel showEmail;
 	
 	/**
 	 * Launch the application.
@@ -86,13 +88,23 @@ public class MemberTrainerInfoFrame extends JFrame {
 		
 		JLabel lblPhone = new JLabel("전화번호");
 		lblPhone.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		lblPhone.setBounds(224, 82, 74, 21);
+		lblPhone.setBounds(224, 113, 74, 21);
 		contentPane.add(lblPhone);
 		
 		showPhone = new JLabel("010-6666-6666");
 		showPhone.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		showPhone.setBounds(306, 82, 164, 21);
+		showPhone.setBounds(306, 113, 164, 21);
 		contentPane.add(showPhone);
+		
+		lblEmail = new JLabel("이메일");
+		lblEmail.setFont(new Font("D2Coding", Font.PLAIN, 17));
+		lblEmail.setBounds(224, 82, 74, 21);
+		contentPane.add(lblEmail);
+		
+		showEmail = new JLabel("test@test.com");
+		showEmail.setFont(new Font("D2Coding", Font.PLAIN, 17));
+		showEmail.setBounds(306, 82, 164, 21);
+		contentPane.add(showEmail);
 	}
 
 }
