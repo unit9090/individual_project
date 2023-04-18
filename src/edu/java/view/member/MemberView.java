@@ -45,20 +45,22 @@ public class MemberView {
 	private JLabel showID;
 	private JLabel showTrainer;
 	private JButton btnshowTrainer;
+	private JButton btnLogout;
 	
 	
 	// PT 일지
 	// 테이블 컬럼 이름
 	private static final String[] PT_COLUMN_NAMES = {"날짜", "제목", "작성자"};
 	private DefaultTableModel modelPt;
-	private JScrollPane scrollPanePt;
-	private JButton btnLogout;
-	private JPanel diaryBtnPanel;
+	private JScrollPane scrollPanePt;	
+	
+	
 	
 	// 다이어리
 	// 테이블 컬럼 이름
 	private static final String[] DIARY_COLUMN_NAMES = {"날짜", "제목", "내용"};
 	private DefaultTableModel modelDiary;	
+	private JPanel diaryPanel;
 	private JButton btnAddDiary;
 	private JButton btnEditDiary;
 	private JButton btnDeleteDiary;
@@ -158,18 +160,18 @@ public class MemberView {
 		paneDiary = new JPanel();
 		paneDiary.setLayout(new BorderLayout(0, 0));
 		
-		diaryBtnPanel = new JPanel();
-		paneDiary.add(diaryBtnPanel, BorderLayout.NORTH);
-		diaryBtnPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		diaryPanel = new JPanel();
+		paneDiary.add(diaryPanel, BorderLayout.NORTH);
+		diaryPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		textSearch = new JTextField();
 		textSearch.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		diaryBtnPanel.add(textSearch);
+		diaryPanel.add(textSearch);
 		textSearch.setColumns(30);
 		
 		btnSearchDiary = new JButton("제목 검색");
 		btnSearchDiary.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		diaryBtnPanel.add(btnSearchDiary);
+		diaryPanel.add(btnSearchDiary);
 		
 		scrollPaneDiary = new JScrollPane();
 		paneDiary.add(scrollPaneDiary, BorderLayout.CENTER);
@@ -396,6 +398,7 @@ public class MemberView {
 			
 			// 사용자가 파일을 선택하고 "열기" 버튼을 누른 경우
 			String filePath = chooser.getSelectedFile().getPath();	// 파일 경로명 리턴
+			System.out.println(filePath);
 			ImageIcon icon = new ImageIcon(filePath);
 			Image img = icon.getImage();
 			Image chageImg = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);

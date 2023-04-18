@@ -124,8 +124,6 @@ public class LoginView {
 			public void actionPerformed(ActionEvent e) {
 				count++;
 				if(count == 10) {
-					System.out.println("야호");
-					System.out.println(count);
 					count = 0;
 					frame.setVisible(false);
 					JoinView.showJoinView(frame);

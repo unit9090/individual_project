@@ -24,6 +24,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import edu.java.view.LoginView;
+import javax.swing.JTextField;
 
 public class TrainerView {
 
@@ -38,12 +39,14 @@ public class TrainerView {
 	private JPanel paneMemberManagement;
 	private JScrollPane scrollPane;
 	private JTable table;
-	private JPanel panel;
+	private JPanel panelBtn;
 	private JButton btnDownForm;
 	private JButton btnCreateMember;
 	private JButton btnUpdateMember;
 	private JButton btnDeleteMember;
 	private JButton btnPtMember;
+	
+	// 마이페이지
 	private JPanel paneTrainerMyPage;
 	private JLabel lblImage;
 	private JButton btnImageChage;
@@ -58,46 +61,50 @@ public class TrainerView {
 	private JLabel lblMyPageIcon;
 	private JLabel lblMyPage;
 	private JButton btnLogout;
+	private JPanel panelSearch;
+	private JTextField textSearch;
+	private JButton btnSearch;
 
 	/**
 	 * Launch the application.
 	 */
-//	public static void TrainerViewShow(Component parent) {
-//	EventQueue.invokeLater(new Runnable() {
-//		public void run() {
-//			try {
-//				TrainerView window = new TrainerView(parent);
-//				window.frame.setVisible(true);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	});
-//}
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					TrainerView window = new TrainerView();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+	public static void TrainerViewShow(Component parent) {
+	EventQueue.invokeLater(new Runnable() {
+		public void run() {
+			try {
+				TrainerView window = new TrainerView(parent);
+				window.frame.setVisible(true);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		});
-	}
+		}
+	});
+}
+	
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					TrainerView window = new TrainerView();
+//					window.frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the application.
 	 */
-//	public TrainerView(Component parent) {
-//	this.parent = parent;
-//	initialize();
-//}
-	public TrainerView() {
+	public TrainerView(Component parent) {
+		this.parent = parent;
 		initialize();
 	}
+	
+//	public TrainerView() {
+//		initialize();
+//	}
 
 	/**
 	 * Initialize the contents of the frame.
@@ -119,6 +126,18 @@ public class TrainerView {
 		
 		// 회원등록 - 회원 리스트, 회원 인바디 관리, 회원 PT일지
 		tabbedPane.addTab("회원 관리", paneMemberManagement());
+		
+		panelSearch = new JPanel();
+		paneMemberManagement.add(panelSearch, BorderLayout.NORTH);
+		
+		textSearch = new JTextField();
+		textSearch.setFont(new Font("D2Coding", Font.PLAIN, 17));
+		panelSearch.add(textSearch);
+		textSearch.setColumns(38);
+		
+		btnSearch = new JButton("검색");
+		btnSearch.setFont(new Font("D2Coding", Font.PLAIN, 15));
+		panelSearch.add(btnSearch);
 		
 		// 마이페이지
 		tabbedPane.addTab("마이페이지", paneTrainerMyPage());
@@ -201,33 +220,44 @@ public class TrainerView {
 		table.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		scrollPane.setViewportView(table);
 		
-		panel = new JPanel();
-		paneMemberManagement.add(panel, BorderLayout.EAST);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panelBtn = new JPanel();
+		paneMemberManagement.add(panelBtn, BorderLayout.EAST);
+		panelBtn.setLayout(new BoxLayout(panelBtn, BoxLayout.Y_AXIS));
 		
 		btnDownForm = new JButton("회원등록폼");
 		btnDownForm.setFont(new Font("D2Coding", Font.PLAIN, 15));
-		panel.add(btnDownForm);
-		panel.add(Box.createVerticalStrut(5));
+		panelBtn.add(btnDownForm);
+		panelBtn.add(Box.createVerticalStrut(5));
 		
 		btnCreateMember = new JButton("회원 등록");
 		btnCreateMember.setFont(new Font("D2Coding", Font.PLAIN, 15));
-		panel.add(btnCreateMember);
-		panel.add(Box.createVerticalStrut(5));
+		panelBtn.add(btnCreateMember);
+		panelBtn.add(Box.createVerticalStrut(5));
 		
 		btnUpdateMember = new JButton("회원 수정");
+		btnUpdateMember.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TrainerMemberInfoUpdateFrame.showMemberInfoUpdate(frame);
+			}
+		});
 		btnUpdateMember.setFont(new Font("D2Coding", Font.PLAIN, 15));
-		panel.add(btnUpdateMember);
-		panel.add(Box.createVerticalStrut(5));
+		panelBtn.add(btnUpdateMember);
+		panelBtn.add(Box.createVerticalStrut(5));
 		
 		btnDeleteMember = new JButton("회원 삭제");
 		btnDeleteMember.setFont(new Font("D2Coding", Font.PLAIN, 15));
-		panel.add(btnDeleteMember);
-		panel.add(Box.createVerticalGlue());
+		panelBtn.add(btnDeleteMember);
+		panelBtn.add(Box.createVerticalGlue());
 		
 		btnPtMember = new JButton("회원 PT 일지");
+		btnPtMember.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.setVisible(false);
+				TrainerMemberPtDiaryView.showTrainerMemberPtDiary(frame);
+			}
+		});
 		btnPtMember.setFont(new Font("D2Coding", Font.PLAIN, 15));
-		panel.add(btnPtMember);
+		panelBtn.add(btnPtMember);
 		
 		return paneMemberManagement;
 	}
