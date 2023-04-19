@@ -7,7 +7,13 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -23,9 +29,9 @@ import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import edu.java.controller.ProfileDaoImpl;
 import edu.java.controller.TrainerDaoImpl;
 import edu.java.model.Trainer;
-import edu.java.services.JoinViewService;
 import edu.java.view.LoginView;
 import javax.swing.JTextField;
 
@@ -71,7 +77,8 @@ public class TrainerView {
 	private JButton btnSearch;
 	
 	// service
-	private final TrainerDaoImpl dao = TrainerDaoImpl.getInstance();
+	private final TrainerDaoImpl trDao = TrainerDaoImpl.getInstance();
+	private final ProfileDaoImpl proDao = ProfileDaoImpl.getInstance();
 
 	/**
 	 * Launch the application.
@@ -113,7 +120,7 @@ public class TrainerView {
 	}
 	
 	public void readTrainerInfo() {
-		Trainer trainer = dao.selectTrainerInfo(userId);
+		Trainer trainer = trDao.selectTrainerInfo(userId);
 		
 		showID.setText(userId);
 		showName.setText(trainer.getName());		
@@ -358,6 +365,17 @@ public class TrainerView {
 			
 			// 사용자가 파일을 선택하고 "열기" 버튼을 누른 경우
 			String filePath = chooser.getSelectedFile().getPath();	// 파일 경로명 리턴
+			
+			BufferedImage image = null;
+			try {
+				File imageFile = new File(filePath);
+				image = ImageIO.read(imageFile);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			
+			// TODO
+			
 			ImageIcon icon = new ImageIcon(filePath);
 			Image img = icon.getImage();
 			Image chageImg = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
