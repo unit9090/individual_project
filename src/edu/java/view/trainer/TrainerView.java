@@ -23,6 +23,9 @@ import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import edu.java.controller.TrainerDaoImpl;
+import edu.java.model.Trainer;
+import edu.java.services.JoinViewService;
 import edu.java.view.LoginView;
 import javax.swing.JTextField;
 
@@ -30,6 +33,8 @@ public class TrainerView {
 
 	private JFrame frame;
 	private Component parent;
+	private String userId;
+	
 	private JTabbedPane tabbedPane;
 	
 	// 회원 관리
@@ -51,7 +56,7 @@ public class TrainerView {
 	private JLabel lblImage;
 	private JButton btnImageChage;
 	private JLabel showBirth;
-	private Component showName;
+	private JLabel showName;
 	private JLabel lblEmail;
 	private JLabel showEmail;
 	private JLabel lblPhone;
@@ -64,15 +69,18 @@ public class TrainerView {
 	private JPanel panelSearch;
 	private JTextField textSearch;
 	private JButton btnSearch;
+	
+	// service
+	private final TrainerDaoImpl dao = TrainerDaoImpl.getInstance();
 
 	/**
 	 * Launch the application.
 	 */
-	public static void TrainerViewShow(Component parent) {
+	public static void TrainerViewShow(Component parent, String id) {
 	EventQueue.invokeLater(new Runnable() {
 		public void run() {
 			try {
-				TrainerView window = new TrainerView(parent);
+				TrainerView window = new TrainerView(parent, id);
 				window.frame.setVisible(true);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -97,9 +105,21 @@ public class TrainerView {
 	/**
 	 * Create the application.
 	 */
-	public TrainerView(Component parent) {
+	public TrainerView(Component parent, String id) {
 		this.parent = parent;
+		this.userId = id;
 		initialize();
+		readTrainerInfo();
+	}
+	
+	public void readTrainerInfo() {
+		Trainer trainer = dao.selectTrainerInfo(userId);
+		
+		showID.setText(userId);
+		showName.setText(trainer.getName());		
+		showBirth.setText(trainer.getBirth());
+		showEmail.setText(trainer.getEmail());
+		showPhone.setText(trainer.getPhone());
 	}
 	
 //	public TrainerView() {
@@ -133,7 +153,7 @@ public class TrainerView {
 		textSearch = new JTextField();
 		textSearch.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		panelSearch.add(textSearch);
-		textSearch.setColumns(38);
+		textSearch.setColumns(25);
 		
 		btnSearch = new JButton("검색");
 		btnSearch.setFont(new Font("D2Coding", Font.PLAIN, 15));
@@ -215,6 +235,7 @@ public class TrainerView {
 		paneMemberManagement.add(scrollPane, BorderLayout.CENTER);
 		
 		table = new JTable();
+		table.setCellSelectionEnabled(true);
 		modelMember = new DefaultTableModel(null, MEMBER_COLUMN_NAMES);
 		table.setModel(modelMember);
 		table.setFont(new Font("D2Coding", Font.PLAIN, 17));

@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -13,15 +15,16 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import edu.java.controller.JoinUserDaoImpl;
+import edu.java.model.JoinUser;
+import edu.java.model.Trainer;
+import edu.java.services.JoinViewService;
 import edu.java.services.TextFilter;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class JoinView {
 
@@ -35,11 +38,18 @@ public class JoinView {
 	
 	private Component parent;
 	private JTextField textEmail;
-	private JLabel lblRePasswordLabel;
-	private JButton btnNewButton;
+	private JButton btnIdDoubleCheck;
 	private JTextField textBirth;
 	
-	private final JoinUserDaoImpl dao = JoinUserDaoImpl.getInstance();
+	// JoinViewService
+	private JoinViewService service = new JoinViewService();
+	
+	// id 확인
+	private boolean idCheck = false;
+	private JButton btnJoin;
+	private JRadioButton radioGender1;
+	private JRadioButton radioGender2;
+	
 
 	/**
 	 * Launch the application.
@@ -110,14 +120,14 @@ public class JoinView {
 		lblGender.setBounds(33, 174, 112, 36);
 		frame.getContentPane().add(lblGender);
 		
-		JRadioButton radioGender1 = new JRadioButton("남자");
+		radioGender1 = new JRadioButton("남자");
 		buttonGroupGender.add(radioGender1);
 		radioGender1.setBackground(new Color(192, 192, 192));
 		radioGender1.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		radioGender1.setBounds(159, 174, 90, 36);
 		frame.getContentPane().add(radioGender1);
 		
-		JRadioButton radioGender2 = new JRadioButton("여자");
+		radioGender2 = new JRadioButton("여자");
 		buttonGroupGender.add(radioGender2);
 		radioGender2.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		radioGender2.setBackground(Color.LIGHT_GRAY);
@@ -129,11 +139,20 @@ public class JoinView {
 		lblId.setBounds(33, 358, 112, 36);
 		frame.getContentPane().add(lblId);
 		
+		// ID
 		textId = new JTextField();
 		textId.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		textId.setColumns(10);
 		textId.setBounds(157, 358, 164, 36);
 		frame.getContentPane().add(textId);
+		textId.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+				if(idCheck) {
+//					System.out.println("이 새끼 고쳤어요!");
+					idCheck = false;
+				}
+			}
+		});
 		
 		JLabel lblPassword = new JLabel("비밀번호");
 		lblPassword.setFont(new Font("D2Coding", Font.PLAIN, 17));
@@ -158,7 +177,12 @@ public class JoinView {
 		textPasswordCheck.setBounds(157, 450, 251, 36);
 		frame.getContentPane().add(textPasswordCheck);
 		
-		JButton btnJoin = new JButton("가입");
+		btnJoin = new JButton("가입");
+		btnJoin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnJoinAction(e);
+			}
+		});
 		btnJoin.setFont(new Font("D2Coding", Font.BOLD, 17));
 		btnJoin.setBounds(167, 542, 100, 36);
 		frame.getContentPane().add(btnJoin);
@@ -191,23 +215,17 @@ public class JoinView {
 		textEmail.setBounds(157, 312, 251, 36);
 		frame.getContentPane().add(textEmail);
 		
-		lblRePasswordLabel = new JLabel("* 비밀번호가 다릅니다.");
-		lblRePasswordLabel.setForeground(Color.RED);
-		lblRePasswordLabel.setFont(new Font("Dialog", Font.PLAIN, 12));
-		lblRePasswordLabel.setBounds(158, 489, 250, 15);
-		frame.getContentPane().add(lblRePasswordLabel);
-		lblRePasswordLabel.setVisible(false);
-		
-		btnNewButton = new JButton("중복확인");
-		btnNewButton.addActionListener(new ActionListener() {
+		// 중복확인
+		btnIdDoubleCheck = new JButton("중복확인");
+		btnIdDoubleCheck.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				dao.doubleCheck(text)
-				dao.doubleCheck(textId.getText());
+				idCheck = service.checkIdDouble(frame, textId.getText(), "TR");
+				System.out.println(idCheck);
 			}
 		});
-		btnNewButton.setFont(new Font("Dialog", Font.PLAIN, 12));
-		btnNewButton.setBounds(326, 358, 82, 36);
-		frame.getContentPane().add(btnNewButton);
+		btnIdDoubleCheck.setFont(new Font("Dialog", Font.PLAIN, 12));
+		btnIdDoubleCheck.setBounds(326, 358, 82, 36);
+		frame.getContentPane().add(btnIdDoubleCheck);
 		
 		JLabel lblBirth = new JLabel("생년월일");
 		lblBirth.setFont(new Font("D2Coding", Font.PLAIN, 17));
@@ -224,6 +242,125 @@ public class JoinView {
 			}
 		});
 		frame.getContentPane().add(textBirth);
+	}
+
+	// 회원가입 btn click
+	private void btnJoinAction(ActionEvent e) {
+		String id = textId.getText();
+		String name = textName.getText();
+		String phone = textPhone.getText();
+		String gender = radioGender1.isSelected() ? "M" : "F";
+		System.out.println(gender);
+		String division = "TR";
+		String birth = textBirth.getText();
+		String email = textEmail.getText();
+		
+		// 빈 칸 확인
+		if(!checkIsEmpty()) {
+			return;
+		}
+				
+		String password = textPassword.getText();
+		String passwordCheck = textPasswordCheck.getText();
+		
+		// 중복 확인
+		if(!idCheck) {
+			JOptionPane.showMessageDialog(
+					frame,
+					"ID 중복확인을 해주세요.",
+					"아이디 중복 확인",
+					JOptionPane.WARNING_MESSAGE
+			);
+			
+			return;
+		}
+		
+		// 비밀번호 길이 확인
+		if(password.length() < 4) {
+			JOptionPane.showMessageDialog(frame, "비밀번호는 4자리 이상 입력하셔야 합니다.");
+			
+			return;
+		}
+		
+		// 비밀번호 확인
+		if(!password.equals(passwordCheck)) {
+			JOptionPane.showMessageDialog(
+					frame,
+					"비밀번호와 비밀번호 확인이 다릅니다.",
+					"비밀번호 확인 오류",
+					JOptionPane.WARNING_MESSAGE
+			);
+			
+			return;
+		}
+		
+		// 생년월일 길이
+		if(birth.length() < 10) {
+			JOptionPane.showMessageDialog(
+					frame,
+					"생년월일 8자리를 제대로 입력해주세요.",
+					"생년월일 확인 오류",
+					JOptionPane.WARNING_MESSAGE
+			);
+			
+			return;
+		}
+		
+		// 전화번호 길이
+		if(phone.length() < 13) {
+			JOptionPane.showMessageDialog(
+					frame,
+					"전화번호 11자리를 제대로 입력해주세요.",
+					"전화번호 확인 오류",
+					JOptionPane.WARNING_MESSAGE
+			);
+			
+			return;
+		}
+		
+		// 회원가입		
+		JoinUser joinUser = new JoinUser(id, password, phone, division);
+		Trainer trainer = new Trainer(id, name, gender, birth, phone, email);
+		
+		int result = service.joinUserCheck(frame, joinUser, trainer);
+		
+		if(result == 1) {
+			JOptionPane.showMessageDialog(frame, "회원가입에 성공하셨습니다.");
+			frame.dispose();
+			LoginView.showLoginView(frame);
+		}
+		
+	}
+	
+	// 빈 칸 확인
+	private boolean checkIsEmpty() {
+		JTextField[] field = {textName, textPhone, textEmail, textBirth, textId, textPassword};
+		
+		for(JTextField f : field) {
+			if(f.getText().isEmpty()) {
+				JOptionPane.showMessageDialog(
+						frame,
+						"빈 칸이 있습니다. 확인해주세요.",
+						"공백 확인",
+						JOptionPane.INFORMATION_MESSAGE
+				);
+				
+				return false;
+			}
+		}
+		
+		if(!(radioGender1.isSelected() || radioGender2.isSelected())) {
+			JOptionPane.showMessageDialog(
+					frame,
+					"성별을 선택해주세요.",
+					"공백 확인",
+					JOptionPane.INFORMATION_MESSAGE
+			);
+			
+			return false;
+		}
+		
+		return true;
 	}
 	
 }

@@ -98,7 +98,7 @@ public class TrainerMemberPtDiaryView {
 			public void windowClosing(WindowEvent e) {
 				frame.setVisible(false);
 				// TODO: 활성화
-				TrainerView.TrainerViewShow(frame);
+//				TrainerView.TrainerViewShow(frame);
 			}
 		});
 		

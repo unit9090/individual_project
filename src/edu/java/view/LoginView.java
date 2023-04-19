@@ -8,7 +8,10 @@ import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -19,6 +22,12 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.event.AncestorListener;
+
+import edu.java.services.JoinViewService;
+import edu.java.services.LoginViewService;
+import edu.java.view.member.MemberView;
+import edu.java.view.trainer.TrainerView;
+
 import javax.swing.event.AncestorEvent;
 
 public class LoginView {
@@ -26,13 +35,16 @@ public class LoginView {
 	private JFrame frame;
 	private JLabel lblId;
 	private JTextField textId;
-	private JTextField textPwd;
+	private JPasswordField textPwd;
 	private JLabel lblPwd;
 	private JButton btnLogin;
 	private JButton btnFindPwd;
 	
 	private Component parent;
 	private static int count = 0;
+	
+	// service
+	private LoginViewService service = new LoginViewService();
 
 	/**
 	 * Launch the application.
@@ -99,25 +111,35 @@ public class LoginView {
 		lblPwd.setBounds(72, 449, 57, 22);
 		frame.getContentPane().add(lblPwd);
 		
-		textPwd = new JTextField();
+		textPwd = new JPasswordField();
 		textPwd.setFont(new Font("D2Coding", Font.PLAIN, 15));
-		textPwd.setColumns(10);
 		textPwd.setBounds(141, 449, 150, 22);
 		frame.getContentPane().add(textPwd);
 		
 		btnLogin = new JButton("로그인");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String x = service.loginUser(frame, textId.getText(), textPwd.getText());
+				
+				if(x != null) {
+					if(x.equals("MB")) {
+						frame.dispose();
+						MemberView.MemberViewShow(frame, textId.getText());
+					} else if(x.equals("TR")) {
+						frame.dispose();
+						TrainerView.TrainerViewShow(frame, textId.getText());
+					}
+				}
 			}
 		});
 		btnLogin.setFont(new Font("D2Coding", Font.BOLD, 15));
 		btnLogin.setBounds(303, 411, 83, 60);
 		frame.getContentPane().add(btnLogin);
 		
-		btnFindPwd = new JButton("비밀번호 찾기");
-		btnFindPwd.setFont(new Font("D2Coding", Font.BOLD, 15));
-		btnFindPwd.setBounds(238, 481, 148, 36);
-		frame.getContentPane().add(btnFindPwd);
+//		btnFindPwd = new JButton("비밀번호 찾기");
+//		btnFindPwd.setFont(new Font("D2Coding", Font.BOLD, 15));
+//		btnFindPwd.setBounds(238, 481, 148, 36);
+//		frame.getContentPane().add(btnFindPwd);
 		
 		JButton btnJoin = new JButton(new ImageIcon("images/login_image.png"));
 		btnJoin.addActionListener(new ActionListener() {

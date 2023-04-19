@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.java.model.JoinUser;
 import oracle.jdbc.OracleDriver;
@@ -54,19 +55,20 @@ public class JoinUserDaoImpl implements JoinUserDao {
 	
 	// USER ID, PWD 생성
 	private static final String SQL_INSERT = 
-			"INSERT INTO" + TBL_NAME
+			"INSERT INTO " + TBL_NAME
 			+ " (" + COL_ID + ", " + COL_PWD
 			+ ", " + COL_PHONE + ", " + COL_DIVISION
-			+ ") VALUES"
-			+ " (?, ?, ?, ?)";
+			+ ") VALUES "
+			+ "(?, ?, ?, ?)";
 	
 	@Override
-	public int joinUser(JoinUser joinUser) {
+	public int insertUser(JoinUser joinUser) {
 		// 리턴 상수
 		int result = 0;
 		
 		Connection conn = null;
 		PreparedStatement stmt = null;
+		System.out.println(SQL_INSERT);
 		
 		try {
 			conn = getConnection();
@@ -93,11 +95,11 @@ public class JoinUserDaoImpl implements JoinUserDao {
 		return result;
 	}
 	
-	// 중복확인
+	// Trainer 중복확인
 	private static final String SQL_SELECT_DOUBLE = 
-			"SELECT " + COL_ID + " FROM" + TBL_NAME;
+			"SELECT " + COL_ID + " FROM " + TBL_NAME + " WHERE " + COL_DIVISION + " = ?";
 	@Override
-	public boolean doubleCheck(String id) {
+	public boolean doubleCheck(String id, String division) {
 		boolean result = false;
 		ArrayList<String> list = new ArrayList<>();
 		
@@ -108,7 +110,8 @@ public class JoinUserDaoImpl implements JoinUserDao {
 		try {
 			conn = getConnection();
 			System.out.println(SQL_SELECT_DOUBLE);
-			stmt = conn.prepareStatement(SQL_SELECT_DOUBLE);	
+			stmt = conn.prepareStatement(SQL_SELECT_DOUBLE);
+			stmt.setString(1, division);
 			rs = stmt.executeQuery();
 			
 			while(rs.next()) {
@@ -135,5 +138,85 @@ public class JoinUserDaoImpl implements JoinUserDao {
 		return result;
 	}
 	
-	 
+	// login TR & MB ID 확인
+	private static final String SQL_SELECT_USER_ID = 
+			"SELECT " + COL_ID + " FROM " + TBL_NAME;
+	
+	@Override
+	public boolean loginUserCheck(String id) {
+		boolean result = false;
+		ArrayList<String> list = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			System.out.println(SQL_SELECT_USER_ID);
+			stmt = conn.prepareStatement(SQL_SELECT_USER_ID);
+			rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				// 각 컬럼의 값들을 읽음.
+				String ids = rs.getString(COL_ID);
+				list.add(ids);
+			}
+			
+			if(list.contains(id)) {
+				result = true;
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				closeResource(conn, stmt, rs);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
+	// 해당 아이디에 일치하는 비밀번호 리턴
+	private static final String SQL_SELECT_USER_PWD = 
+			"SELECT " + COL_PWD + ", " + COL_DIVISION + 
+			" FROM " + TBL_NAME + " WHERE " + COL_ID + " = ?";
+	
+	@Override
+	public String[] loginUserEqualsIdAndPwd(String id) {
+		String[] user = new String[2];
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			System.out.println(SQL_SELECT_USER_PWD);
+			stmt = conn.prepareStatement(SQL_SELECT_USER_PWD);
+			stmt.setString(1, id);
+			rs = stmt.executeQuery();
+			
+			if(rs.next()) {
+				user[0] = rs.getString(COL_PWD);
+				user[1] = rs.getString(COL_DIVISION);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				closeResource(conn, stmt, rs);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return user;
+	}
+	
 }

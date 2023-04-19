@@ -31,6 +31,7 @@ public class MemberView {
 
 	private JFrame frame;	
 	private Component parent;
+	private String userId;
 	
 	private JTabbedPane tabbedPane;
 	private JPanel paneDiary;
@@ -80,24 +81,11 @@ public class MemberView {
 	/**
 	 * Launch the application.
 	 */
-//	public static void MemberViewShow(Component parent) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					MemberView window = new MemberView(parent);
-//					window.frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
-	
-	public static void main(String[] args) {
+	public static void MemberViewShow(Component parent, String id) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MemberView window = new MemberView();
+					MemberView window = new MemberView(parent, id);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -105,18 +93,32 @@ public class MemberView {
 			}
 		});
 	}
+	
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					MemberView window = new MemberView();
+//					window.frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the application.
 	 */
-//	public MemberView(Component parent) {
-//		this.parent = parent;
-//		initialize();
-//	}
-	
-	public MemberView() {
+	public MemberView(Component parent, String id) {
+		this.parent = parent;
+		this.userId = id;
 		initialize();
 	}
+	
+//	public MemberView() {
+//		initialize();
+//	}
 
 	/**
 	 * Initialize the contents of the frame.
