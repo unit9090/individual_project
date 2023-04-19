@@ -32,6 +32,7 @@ import javax.swing.table.DefaultTableModel;
 import edu.java.controller.ProfileDaoImpl;
 import edu.java.controller.TrainerDaoImpl;
 import edu.java.model.Trainer;
+import edu.java.services.ProfileService;
 import edu.java.view.LoginView;
 import javax.swing.JTextField;
 
@@ -76,39 +77,28 @@ public class TrainerView {
 	private JTextField textSearch;
 	private JButton btnSearch;
 	
-	// service
+	// dao
 	private final TrainerDaoImpl trDao = TrainerDaoImpl.getInstance();
-	private final ProfileDaoImpl proDao = ProfileDaoImpl.getInstance();
+	
+	// service
+	ProfileService proService = new ProfileService();
 
 	/**
 	 * Launch the application.
 	 */
 	public static void TrainerViewShow(Component parent, String id) {
-	EventQueue.invokeLater(new Runnable() {
-		public void run() {
-			try {
-				TrainerView window = new TrainerView(parent, id);
-				window.frame.setVisible(true);
-			} catch (Exception e) {
-				e.printStackTrace();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					TrainerView window = new TrainerView(parent, id);
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-		}
-	});
-}
+		});
+	}
 	
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					TrainerView window = new TrainerView();
-//					window.frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
-
 	/**
 	 * Create the application.
 	 */
@@ -117,8 +107,20 @@ public class TrainerView {
 		this.userId = id;
 		initialize();
 		readTrainerInfo();
+		readUserImage();
 	}
 	
+	// 사진 파일 set
+	public void readUserImage() {
+		String file = proService.ByteArrayToimage(userId);
+		if(file != null) {
+			Image memberImg = new ImageIcon(file).getImage();
+			Image chageMemberImg = memberImg.getScaledInstance(lblImage.getWidth(), lblImage.getHeight(), Image.SCALE_SMOOTH);
+			lblImage.setIcon(new ImageIcon(chageMemberImg));
+		}
+	}
+	
+	// 마이페이지 set
 	public void readTrainerInfo() {
 		Trainer trainer = trDao.selectTrainerInfo(userId);
 		
@@ -128,10 +130,6 @@ public class TrainerView {
 		showEmail.setText(trainer.getEmail());
 		showPhone.setText(trainer.getPhone());
 	}
-	
-//	public TrainerView() {
-//		initialize();
-//	}
 
 	/**
 	 * Initialize the contents of the frame.
@@ -151,7 +149,7 @@ public class TrainerView {
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		
-		// 회원등록 - 회원 리스트, 회원 인바디 관리, 회원 PT일지
+		// 회원등록 - 회원 리스트, 회원 PT일지
 		tabbedPane.addTab("회원 관리", paneMemberManagement());
 		
 		panelSearch = new JPanel();
@@ -308,7 +306,15 @@ public class TrainerView {
 		lblImage.setIcon(new ImageIcon(chageMemberImg));
 		
 		btnImageChage = new JButton("이미지 변경");
-		btnImageChage.addActionListener(new OpenActionListener());
+		btnImageChage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String filePath = proService.OpenActionFolder(frame, userId);
+				Image memberImg = new ImageIcon(filePath).getImage();
+				Image chageMemberImg = memberImg.getScaledInstance(lblImage.getWidth(), lblImage.getHeight(), Image.SCALE_SMOOTH);
+				lblImage.setIcon(new ImageIcon(chageMemberImg));
+			}
+		});
 		btnImageChage.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		btnImageChage.setBounds(12, 274, 200, 23);
 		paneTrainerMyPage.add(btnImageChage);

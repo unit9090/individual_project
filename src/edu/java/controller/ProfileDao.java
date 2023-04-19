@@ -1,7 +1,5 @@
 package edu.java.controller;
 
-import java.awt.image.BufferedImage;
-
 public interface ProfileDao {
 	
 	/**
@@ -11,7 +9,7 @@ public interface ProfileDao {
 	 * @param pblob
 	 * @return int
 	 */
-	int saveImage(String id, BufferedImage image);
+	int saveImage(String id, byte[] byteArr);
 	
 	/**
 	 * 이미지 파일 찾기
@@ -20,4 +18,6 @@ public interface ProfileDao {
 	 * @return byte[]
 	 */
 	byte[] selectImage(String id);
+	
+	
 }
