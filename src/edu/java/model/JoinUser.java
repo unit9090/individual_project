@@ -13,13 +13,13 @@ public class JoinUser {
 	// fields
 	private String id;
 	private String pwd;
-	private int phone;
+	private String phone;
 	private String division;
 	
 	// constructor
 	public JoinUser() {}
 
-	public JoinUser(String id, String pwd, int phone, String division) {
+	public JoinUser(String id, String pwd, String phone, String division) {
 		super();
 		this.id = id;
 		this.pwd = pwd;
@@ -44,11 +44,11 @@ public class JoinUser {
 		this.pwd = pwd;
 	}
 
-	public int getPhone() {
+	public String getPhone() {
 		return phone;
 	}
 
-	public void setPhone(int phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 

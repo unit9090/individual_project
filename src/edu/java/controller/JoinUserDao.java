@@ -1,5 +1,7 @@
 package edu.java.controller;
 
+import java.util.List;
+
 import edu.java.model.JoinUser;
 
 public interface JoinUserDao {
@@ -11,5 +13,10 @@ public interface JoinUserDao {
 	 */
 	int joinUser(JoinUser joinUser);
 	
-	
+	/**
+	 * 아이디 중복확인
+	 * @param id
+	 * @return boolean
+	 */
+	boolean doubleCheck(String id);
 }

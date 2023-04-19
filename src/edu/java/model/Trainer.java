@@ -17,14 +17,14 @@ public class Trainer {
 	private String id;
 	private String name;
 	private String gender;
-	private int birth;
-	private int phone;
+	private String birth;
+	private String phone;
 	private String email;
 	
 	// constructor
 	public Trainer() {}
 
-	public Trainer(String id, String name, String gender, int birth, int phone, String email) {
+	public Trainer(String id, String name, String gender, String birth, String phone, String email) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -59,19 +59,19 @@ public class Trainer {
 		this.gender = gender;
 	}
 
-	public int getBirth() {
+	public String getBirth() {
 		return birth;
 	}
 
-	public void setBirth(int birth) {
+	public void setBirth(String birth) {
 		this.birth = birth;
 	}
 
-	public int getPhone() {
+	public String getPhone() {
 		return phone;
 	}
 
-	public void setPhone(int phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 

@@ -1,19 +1,20 @@
 package edu.java.controller;
 
-// JoinUser 상수
-import static edu.java.model.JoinUser.Entity.*;
-// DB
-import static edu.java.ojdbc.OracleConnect.*;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import edu.java.model.JoinUser;
 import oracle.jdbc.OracleDriver;
+
+//JoinUser 상수
+import static edu.java.model.JoinUser.Entity.*;
+//DB
+import static edu.java.ojdbc.OracleConnect.*;
 
 public class JoinUserDaoImpl implements JoinUserDao {
 	
@@ -34,6 +35,7 @@ public class JoinUserDaoImpl implements JoinUserDao {
 		
 		// 오라클 DB에 접속.
 		Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+		System.out.println(conn);
 		
 		return conn;
 	}
@@ -72,7 +74,7 @@ public class JoinUserDaoImpl implements JoinUserDao {
 			stmt = conn.prepareStatement(SQL_INSERT);			
 			stmt.setString(1, joinUser.getId());
 			stmt.setString(2, joinUser.getPwd());
-			stmt.setInt(3, joinUser.getPhone());
+			stmt.setString(3, joinUser.getPhone());
 			stmt.setString(4, joinUser.getDivision());
 			
 			result = stmt.executeUpdate();
@@ -84,6 +86,48 @@ public class JoinUserDaoImpl implements JoinUserDao {
 			try {
 				closeResources(conn, stmt);
 			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
+	// 중복확인
+	private static final String SQL_SELECT_DOUBLE = 
+			"SELECT " + COL_ID + " FROM" + TBL_NAME;
+	@Override
+	public boolean doubleCheck(String id) {
+		boolean result = false;
+		ArrayList<String> list = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			System.out.println(SQL_SELECT_DOUBLE);
+			stmt = conn.prepareStatement(SQL_SELECT_DOUBLE);	
+			rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				// 각 컬럼의 값들을 읽음.
+				String ids = rs.getString(COL_ID);
+				list.add(ids);
+			}
+			
+			if(!list.contains(id)) {
+				result = true;
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				closeResource(conn, stmt, rs);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

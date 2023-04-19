@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -13,12 +13,15 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import edu.java.controller.IntegerDocument;
-import edu.java.controller.ReplaceText;
+import edu.java.controller.JoinUserDaoImpl;
+import edu.java.services.TextFilter;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class JoinView {
 
@@ -26,18 +29,17 @@ public class JoinView {
 	private JTextField textName;
 	private final ButtonGroup buttonGroupGender = new ButtonGroup();
 	private JTextField textId;
-	private JTextField textPassword;
-	private JTextField textPasswordCheck;
+	private JPasswordField textPassword;
+	private JPasswordField textPasswordCheck;
 	private JTextField textPhone;
 	
 	private Component parent;
-	private JTextField textField;
-	private JLabel lblPasswordLabel;
+	private JTextField textEmail;
 	private JLabel lblRePasswordLabel;
 	private JButton btnNewButton;
 	private JTextField textBirth;
-	private JLabel lblBirthCheck;
-	private JLabel lblPhoneCheck;
+	
+	private final JoinUserDaoImpl dao = JoinUserDaoImpl.getInstance();
 
 	/**
 	 * Launch the application.
@@ -86,9 +88,6 @@ public class JoinView {
 		
 		frame.getContentPane().setLayout(null);
 		
-		// textField 제한
-		IntegerDocument IntDm = new IntegerDocument();		
-		
 		JLabel lblTitle = new JLabel("회원가입");
 		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTitle.setFont(new Font("D2Coding", Font.BOLD, 24));
@@ -127,99 +126,87 @@ public class JoinView {
 		
 		JLabel lblId = new JLabel("ID");
 		lblId.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		lblId.setBounds(33, 386, 112, 36);
+		lblId.setBounds(33, 358, 112, 36);
 		frame.getContentPane().add(lblId);
 		
 		textId = new JTextField();
 		textId.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		textId.setColumns(10);
-		textId.setBounds(157, 386, 164, 36);
+		textId.setBounds(157, 358, 164, 36);
 		frame.getContentPane().add(textId);
 		
 		JLabel lblPassword = new JLabel("비밀번호");
 		lblPassword.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		lblPassword.setBounds(33, 432, 112, 36);
+		lblPassword.setBounds(33, 404, 112, 36);
 		frame.getContentPane().add(lblPassword);
 		
-		textPassword = new JTextField();
+		// 비밀번호
+		textPassword = new JPasswordField();
 		textPassword.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		textPassword.setColumns(10);
-		textPassword.setBounds(157, 432, 251, 36);
+		textPassword.setBounds(157, 404, 251, 36);
 		frame.getContentPane().add(textPassword);
 		
 		JLabel lblPasswordCheck = new JLabel("비밀번호 확인");
 		lblPasswordCheck.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		lblPasswordCheck.setBounds(33, 495, 112, 36);
+		lblPasswordCheck.setBounds(33, 450, 112, 36);
 		frame.getContentPane().add(lblPasswordCheck);
 		
-		textPasswordCheck = new JTextField();
+		textPasswordCheck = new JPasswordField();
 		textPasswordCheck.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		textPasswordCheck.setColumns(10);
-		textPasswordCheck.setBounds(157, 495, 251, 36);
+		textPasswordCheck.setBounds(157, 450, 251, 36);
 		frame.getContentPane().add(textPasswordCheck);
 		
 		JButton btnJoin = new JButton("가입");
 		btnJoin.setFont(new Font("D2Coding", Font.BOLD, 17));
-		btnJoin.setBounds(167, 574, 100, 36);
+		btnJoin.setBounds(167, 542, 100, 36);
 		frame.getContentPane().add(btnJoin);
 		
 		JLabel lblPhone = new JLabel("전화번호");
 		lblPhone.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		lblPhone.setBounds(33, 280, 112, 36);
+		lblPhone.setBounds(33, 266, 112, 36);
 		frame.getContentPane().add(lblPhone);
 		
-		textPhone = new JTextField();
+		// 전화번호
+		textPhone = new JTextField(13);
 		textPhone.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		textPhone.setBounds(157, 280, 251, 36);
-		frame.getContentPane().add(textPhone);
-		textPhone.addKeyListener(new KeyListener() {
-			
-			@Override
+		textPhone.setBounds(157, 266, 251, 36);
+		textPhone.addKeyListener(new KeyAdapter() {
 			public void keyTyped(KeyEvent e) {
-				if(!Character.isDigit(e.getKeyChar())) {
-					lblPhoneCheck.setVisible(true);
-					textPhone.setDocument(IntDm);
-				} else {
-					lblPhoneCheck.setVisible(false);
-				}
+				TextFilter.checkPhone(frame, e);
 			}
-			
-			@Override
-			public void keyReleased(KeyEvent e) {}
-			
-			@Override
-			public void keyPressed(KeyEvent e) {}
 		});
+		frame.getContentPane().add(textPhone);
 		
 		
 		JLabel lblEmail = new JLabel("이메일");
 		lblEmail.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		lblEmail.setBounds(33, 340, 112, 36);
+		lblEmail.setBounds(33, 312, 112, 36);
 		frame.getContentPane().add(lblEmail);
 		
-		textField = new JTextField();
-		textField.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		textField.setColumns(10);
-		textField.setBounds(157, 340, 251, 36);
-		frame.getContentPane().add(textField);
-		
-		lblPasswordLabel = new JLabel("* 비밀번호는 4자리 이상으로 설정해주세요.");
-		lblPasswordLabel.setForeground(Color.RED);
-		lblPasswordLabel.setFont(new Font("Dialog", Font.PLAIN, 12));
-		lblPasswordLabel.setBounds(158, 470, 250, 15);
-		frame.getContentPane().add(lblPasswordLabel);
-		lblPasswordLabel.setVisible(false);
+		textEmail = new JTextField();
+		textEmail.setFont(new Font("D2Coding", Font.PLAIN, 17));
+		textEmail.setColumns(10);
+		textEmail.setBounds(157, 312, 251, 36);
+		frame.getContentPane().add(textEmail);
 		
 		lblRePasswordLabel = new JLabel("* 비밀번호가 다릅니다.");
 		lblRePasswordLabel.setForeground(Color.RED);
 		lblRePasswordLabel.setFont(new Font("Dialog", Font.PLAIN, 12));
-		lblRePasswordLabel.setBounds(158, 534, 250, 15);
+		lblRePasswordLabel.setBounds(158, 489, 250, 15);
 		frame.getContentPane().add(lblRePasswordLabel);
 		lblRePasswordLabel.setVisible(false);
 		
 		btnNewButton = new JButton("중복확인");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+//				dao.doubleCheck(text)
+				dao.doubleCheck(textId.getText());
+			}
+		});
 		btnNewButton.setFont(new Font("Dialog", Font.PLAIN, 12));
-		btnNewButton.setBounds(326, 386, 82, 36);
+		btnNewButton.setBounds(326, 358, 82, 36);
 		frame.getContentPane().add(btnNewButton);
 		
 		JLabel lblBirth = new JLabel("생년월일");
@@ -227,27 +214,16 @@ public class JoinView {
 		lblBirth.setBounds(33, 220, 112, 36);
 		frame.getContentPane().add(lblBirth);
 		
+		// 생년월일
 		textBirth = new JTextField();
 		textBirth.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		textBirth.setColumns(10);
 		textBirth.setBounds(157, 220, 251, 36);
+		textBirth.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) {
+				TextFilter.checkBirth(frame, e);
+			}
+		});
 		frame.getContentPane().add(textBirth);
-		
-		lblBirthCheck = new JLabel("* 생년월일을 8자리로 적어주세요.");
-		lblBirthCheck.setForeground(Color.RED);
-		lblBirthCheck.setFont(new Font("Dialog", Font.PLAIN, 12));
-		lblBirthCheck.setBounds(158, 255, 250, 15);
-		frame.getContentPane().add(lblBirthCheck);
-		
-		lblPhoneCheck = new JLabel("* 전화번호 11자리를 숫자로 적어주세요.");
-		lblPhoneCheck.setForeground(Color.RED);
-		lblPhoneCheck.setFont(new Font("Dialog", Font.PLAIN, 12));
-		lblPhoneCheck.setBounds(158, 315, 250, 15);
-		lblPhoneCheck.setVisible(false);
-		frame.getContentPane().add(lblPhoneCheck);
 	}
 	
-	private String checkMessage(KeyListener key) {
-		return null;
-	}
 }
