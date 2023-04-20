@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -25,6 +26,14 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import edu.java.controller.MemberDao;
+import edu.java.controller.MemberDaoImpl;
+import edu.java.controller.PtDiaryDaoImpl;
+import edu.java.controller.TrainerDaoImpl;
+import edu.java.model.Members;
+import edu.java.model.PtDiary;
+import edu.java.model.Trainer;
+import edu.java.services.PtDiaryService;
 import edu.java.view.LoginView;
 
 public class MemberView {
@@ -51,7 +60,7 @@ public class MemberView {
 	
 	// PT 일지
 	// 테이블 컬럼 이름
-	private static final String[] PT_COLUMN_NAMES = {"날짜", "제목", "작성자"};
+	private static final String[] PT_COLUMN_NAMES = {"NO", "제목", "작성자"};
 	private DefaultTableModel modelPt;
 	private JScrollPane scrollPanePt;	
 	
@@ -61,22 +70,25 @@ public class MemberView {
 	// 테이블 컬럼 이름
 	private static final String[] DIARY_COLUMN_NAMES = {"날짜", "제목", "내용"};
 	private DefaultTableModel modelDiary;	
-	private JPanel diaryPanel;
 	private JButton btnAddDiary;
 	private JButton btnEditDiary;
 	private JButton btnDeleteDiary;
-	private JButton btnSearchDiary;
 	private JScrollPane scrollPaneDiary;
 	private JTable tableDiary;
 	private JPanel panelBtnFrame;
-	private JTextField textSearch;
 	private Component verticalStrut;
 	private Component verticalStrut_1;
-	private Component verticalStrut_2;
 	private JLabel lblPhone;
 	private JLabel showPhone;
-	private JTable table;
+	private JTable tablePt;
 	
+	// dao
+	private final MemberDaoImpl mDao = MemberDaoImpl.getInstance();
+	private final PtDiaryDaoImpl ptDao = PtDiaryDaoImpl.getInstance();
+	private final TrainerDaoImpl trDao = TrainerDaoImpl.getInstance();
+	
+	// service
+	private final PtDiaryService ptService = new PtDiaryService();
 
 	/**
 	 * Launch the application.
@@ -94,19 +106,6 @@ public class MemberView {
 		});
 	}
 	
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					MemberView window = new MemberView();
-//					window.frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
-
 	/**
 	 * Create the application.
 	 */
@@ -114,11 +113,34 @@ public class MemberView {
 		this.parent = parent;
 		this.userId = id;
 		initialize();
+		readMemberInfo();
+		setTableModel();
 	}
 	
-//	public MemberView() {
-//		initialize();
-//	}
+	// 마이페이지 set
+	public void readMemberInfo() {
+		Members member = mDao.readSelectMemberInfo(userId);
+		
+		showID.setText(userId);
+		showName.setText(member.getName());
+		showPhone.setText(member.getPhone());
+		showBirth.setText(member.getBirth());
+		showTrainer.setText(member.getTrainer());
+	}
+	
+	// Pt 일지 set
+	public void setTableModel() {
+		List<PtDiary> list = ptService.loadAllPtDiary(userId);
+		
+		int count = 1;
+		for(PtDiary p : list) {
+			String trainer = trDao.selectTrainerInfo(p.getTrId()).getName();
+			Object[] row =  {count++, p.getTitle(), trainer};
+			modelPt.addRow(row);
+		}
+		
+	}
+
 
 	/**
 	 * Initialize the contents of the frame.
@@ -162,19 +184,6 @@ public class MemberView {
 		paneDiary = new JPanel();
 		paneDiary.setLayout(new BorderLayout(0, 0));
 		
-		diaryPanel = new JPanel();
-		paneDiary.add(diaryPanel, BorderLayout.NORTH);
-		diaryPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
-		textSearch = new JTextField();
-		textSearch.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		diaryPanel.add(textSearch);
-		textSearch.setColumns(30);
-		
-		btnSearchDiary = new JButton("제목 검색");
-		btnSearchDiary.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		diaryPanel.add(btnSearchDiary);
-		
 		scrollPaneDiary = new JScrollPane();
 		paneDiary.add(scrollPaneDiary, BorderLayout.CENTER);
 		
@@ -187,15 +196,12 @@ public class MemberView {
 		panelBtnFrame = new JPanel();
 		paneDiary.add(panelBtnFrame, BorderLayout.EAST);
 		
-		btnAddDiary = new JButton("글쓰기");
+		btnAddDiary = new JButton("글 쓰기");
 		btnAddDiary.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				MemberDiaryCreateFrame.showMemberDiaryCreate(frame);
 			}
 		});
-		
-		verticalStrut_2 = Box.createVerticalStrut(10);
-		panelBtnFrame.add(verticalStrut_2);
 		btnAddDiary.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		panelBtnFrame.add(btnAddDiary);
 		
@@ -250,11 +256,11 @@ public class MemberView {
 		scrollPanePt = new JScrollPane();
 		panel.add(scrollPanePt, BorderLayout.CENTER);
 		
-		table = new JTable();
+		tablePt = new JTable();
 		modelPt = new DefaultTableModel(null, PT_COLUMN_NAMES);
-		table.setModel(modelPt);
-		table.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		scrollPanePt.setViewportView(table);
+		tablePt.setModel(modelPt);
+		tablePt.setFont(new Font("D2Coding", Font.PLAIN, 17));
+		scrollPanePt.setViewportView(tablePt);
 		
 		return panePT;
 	}
@@ -277,11 +283,10 @@ public class MemberView {
 		Image chageMemberImg = memberImg.getScaledInstance(lblImage.getWidth(), lblImage.getHeight(), Image.SCALE_SMOOTH);
 		lblImage.setIcon(new ImageIcon(chageMemberImg));
 		
-		btnImageChage = new JButton("이미지 변경");
-		btnImageChage.addActionListener(new OpenActionListener());
-		btnImageChage.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		btnImageChage.setBounds(12, 274, 200, 23);
-		paneMyPage.add(btnImageChage);
+//		btnImageChage = new JButton("이미지 변경");
+//		btnImageChage.setFont(new Font("D2Coding", Font.PLAIN, 17));
+//		btnImageChage.setBounds(12, 274, 200, 23);
+//		paneMyPage.add(btnImageChage);
 		
 		showName = new JLabel("홍익인간");
 		showName.setFont(new Font("D2Coding", Font.PLAIN, 17));
@@ -367,46 +372,5 @@ public class MemberView {
 		return paneMyPage;		
 	}
 	
-	// 사진 파일 올리기
-	class OpenActionListener implements ActionListener {
-		
-		private JFileChooser chooser;
-		
-		public OpenActionListener() {
-			// 파일 다이얼로그 생성
-			chooser = new JFileChooser();
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			FileNameExtensionFilter filter = new FileNameExtensionFilter(
-					"JPG & PNG Images",		// 파일 이름난에 출력될 문자열
-					"jpg", "png");			// 파일 필터로 사용되는 확장자. *.jpg, *.png만 나열됨.
-			
-			// 파일 다이얼로그에 파일 필터 설정
-			chooser.setFileFilter(filter);
-			// 파일 다이얼로그 출력
-			int ret = chooser.showOpenDialog(null);
-			if(ret != JFileChooser.APPROVE_OPTION) {
-				// 사용자가 창을 강제로 닫았거나 취소버튼을 누른 경우
-				JOptionPane.showMessageDialog(
-						frame,
-						"파일을 선택하지 않았습니다.",
-						"경고",
-						JOptionPane.WARNING_MESSAGE);
-				
-				return;
-			}
-			
-			// 사용자가 파일을 선택하고 "열기" 버튼을 누른 경우
-			String filePath = chooser.getSelectedFile().getPath();	// 파일 경로명 리턴
-			System.out.println(filePath);
-			ImageIcon icon = new ImageIcon(filePath);
-			Image img = icon.getImage();
-			Image chageImg = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-			lblImage.setIcon(new ImageIcon(chageImg));	// 이미지 출력
-		}
-	
-	}
 }
 

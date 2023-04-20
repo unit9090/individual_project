@@ -85,8 +85,8 @@ public class TrainerView {
 	private final TrainerDaoImpl trDao = TrainerDaoImpl.getInstance();
 	
 	// service
-	ProfileService proService = new ProfileService();
-	TrainerService trService = new TrainerService();
+//	private final ProfileService proService = new ProfileService();
+	private final TrainerService trService = new TrainerService();
 
 	/**
 	 * Launch the application.
@@ -213,6 +213,10 @@ public class TrainerView {
 		lblMyPageIcon = new JLabel("");
 		lblMyPageIcon.setBounds(12, 13, 37, 32);
 		paneTrainerMyPage.add(lblMyPageIcon);
+		Image iconImg = new ImageIcon("images/right-arrow.png").getImage();
+		Image chageIconImg = iconImg.getScaledInstance(lblMyPageIcon.getWidth(), lblMyPageIcon.getHeight(), Image.SCALE_SMOOTH);
+		lblMyPageIcon.setIcon(new ImageIcon(chageIconImg));
+		
 		
 		lblMyPage = new JLabel("마이페이지");
 		lblMyPage.setFont(new Font("D2Coding", Font.BOLD, 20));
@@ -358,7 +362,7 @@ public class TrainerView {
 		
 		int confirm = JOptionPane.showConfirmDialog(
 				frame,
-				"정말 삭제하시겠습니까?",
+				"정말 삭제하시겠습니까?\n해당 아이디에 저장되어 있는 다이어리들도 사라집니다.",
 				"삭제 확인",
 				JOptionPane.YES_NO_OPTION
 		);
@@ -369,7 +373,7 @@ public class TrainerView {
 			trService.deleteMember(id);
 			modelMember.removeRow(row);
 			
-			JOptionPane.showConfirmDialog(frame, "삭제 성공");
+			JOptionPane.showMessageDialog(frame, id + "가 삭제되었습니다.");
 		}
 		
 		

@@ -206,19 +206,6 @@ public class TrainerMemberInfoCreateFrame extends JFrame {
 	
 	
 	private void createMember() {
-		String id = textPhone.getText().replaceAll("-", "");
-		String pwd = textPhone.getText().replaceAll("-", "");
-		String name = textName.getText();
-		String phone = textPhone.getText();
-		String gender = "";
-		if(radioGender1.isSelected()) gender = "M";
-		else gender = "F";
-		String birth = textBirth.getText();
-		int height = Integer.parseInt(textHeight.getText());
-		int weight = Integer.parseInt(textWeight.getText());
-		
-		Members member = new Members(id, userId, name, gender, birth, phone, height, weight);
-		
 		// 회원 등록 시 빈칸 확인
 		JTextField[] field = {textName, textPhone, textBirth, textHeight, textWeight};
 		
@@ -245,6 +232,18 @@ public class TrainerMemberInfoCreateFrame extends JFrame {
 			
 			return;
 		}
+		
+		String id = textPhone.getText().replaceAll("-", "");
+		String name = textName.getText();
+		String phone = textPhone.getText();
+		String gender = "";
+		if(radioGender1.isSelected()) gender = "M";
+		else gender = "F";
+		String birth = textBirth.getText();
+		int height = Integer.parseInt(textHeight.getText());
+		int weight = Integer.parseInt(textWeight.getText());
+		
+		Members member = new Members(id, userId, name, gender, birth, phone, height, weight);
 		
 		// 빈 칸 확인 후 dao 호출
 		// 성공 시 완료 메시지와 페이지 닫기
