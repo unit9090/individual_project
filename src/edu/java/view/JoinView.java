@@ -219,6 +219,10 @@ public class JoinView {
 		btnIdDoubleCheck = new JButton("중복확인");
 		btnIdDoubleCheck.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(textId.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "아이디를 입력해주세요.");
+					return;
+				}
 				idCheck = service.checkIdDouble(frame, textId.getText(), "TR");
 				System.out.println(idCheck);
 			}

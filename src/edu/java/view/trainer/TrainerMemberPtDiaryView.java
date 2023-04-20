@@ -28,24 +28,25 @@ public class TrainerMemberPtDiaryView {
 	
 	private static final String[] PT_COLUMN_NAMES = {"날짜", "제목"};
 	private DefaultTableModel modelPt;
-	private JTextField textSearch;
-	private JButton btnSearch;
 	private JButton btnCreate;
 	private JButton btnUpdate;
 	private JButton btnDelete;
 	private JTable table;
-	private JLabel lblName;
 	
+	private String trId;
+	private String mbId;
+	
+	// dao
 	
 	
 	/**
 	 * Launch the application.
 	 */
-	public static void showTrainerMemberPtDiary(Component parent) {
+	public static void showTrainerMemberPtDiary(Component parent, String trId, String mbId) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					TrainerMemberPtDiaryView window = new TrainerMemberPtDiaryView(parent);
+					TrainerMemberPtDiaryView window = new TrainerMemberPtDiaryView(parent, trId, mbId);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -53,31 +54,17 @@ public class TrainerMemberPtDiaryView {
 			}
 		});
 	}
-	
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					TrainerMemberPtDiaryView window = new TrainerMemberPtDiaryView();
-//					window.frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
 
 	/**
 	 * Create the application.
 	 */
-	public TrainerMemberPtDiaryView(Component parent) {
+	public TrainerMemberPtDiaryView(Component parent, String trId, String mbId) {
 		this.parent = parent;
+		this.trId = trId;
+		this.mbId = mbId;
+		
 		initialize();
 	}
-	
-//	public TrainerMemberPtDiaryView() {
-//		initialize();
-//	}
 	
 
 	/**
@@ -96,9 +83,9 @@ public class TrainerMemberPtDiaryView {
 		frame.setBounds(x, y, 451, 659);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				frame.setVisible(false);
+				frame.dispose();
 				// TODO: 활성화
-//				TrainerView.TrainerViewShow(frame);
+				TrainerView.TrainerViewShow(frame, trId);
 			}
 		});
 		
@@ -133,22 +120,6 @@ public class TrainerMemberPtDiaryView {
 		btnDelete = new JButton("PT 일지 삭제");
 		btnDelete.setFont(new Font("D2Coding", Font.PLAIN, 15));
 		panelBtn.add(btnDelete);
-		
-		JPanel panelSearch = new JPanel();
-		frame.getContentPane().add(panelSearch, BorderLayout.NORTH);
-		
-		lblName = new JLabel("OO 회원님");
-		lblName.setFont(new Font("D2Coding", Font.BOLD, 17));
-		panelSearch.add(lblName);
-		
-		textSearch = new JTextField();
-		textSearch.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		textSearch.setColumns(30);
-		panelSearch.add(textSearch);
-		
-		btnSearch = new JButton("검색");
-		btnSearch.setFont(new Font("D2Coding", Font.PLAIN, 15));
-		panelSearch.add(btnSearch);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);

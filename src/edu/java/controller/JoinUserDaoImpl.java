@@ -137,6 +137,49 @@ public class JoinUserDaoImpl implements JoinUserDao {
 		return result;
 	}
 	
+	// Member 중복확인
+	private static final String SQL_SELECT_DOUBLE_MB = 
+			"SELECT " + COL_ID + " FROM " + TBL_NAME + " WHERE " + COL_DIVISION + " = ?";
+	@Override
+	public boolean doubleCheckMember(String id, String division) {
+		boolean result = false;
+		ArrayList<String> list = new ArrayList<>();
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = getConnection();
+			System.out.println(SQL_SELECT_DOUBLE_MB);
+			stmt = conn.prepareStatement(SQL_SELECT_DOUBLE_MB);
+			stmt.setString(1, division);
+			rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				// 각 컬럼의 값들을 읽음.
+				String ids = rs.getString(COL_ID);
+				list.add(ids);
+			}
+			
+			if(!list.contains(id)) {
+				result = true;
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				closeResource(conn, stmt, rs);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
 	// login TR & MB ID 확인
 	private static final String SQL_SELECT_USER_ID = 
 			"SELECT " + COL_ID + " FROM " + TBL_NAME;
@@ -216,6 +259,41 @@ public class JoinUserDaoImpl implements JoinUserDao {
 		}
 		
 		return user;
+	}
+	
+	// 해당 아이디 User 삭제
+	private static final String SQL_DELETE = 
+			"DELETE FROM " + TBL_NAME + " WHERE " + COL_ID + " = ?";
+	
+	@Override
+	public int deleteUser(String id) {
+		// 리턴 상수
+		int result = 0;
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		System.out.println(SQL_DELETE);
+		
+		try {
+			conn = getConnection();
+			
+			stmt = conn.prepareStatement(SQL_DELETE);			
+			stmt.setString(1, id);
+			
+			result = stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			
+		} finally {
+			try {
+				closeResources(conn, stmt);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
 	}
 	
 }

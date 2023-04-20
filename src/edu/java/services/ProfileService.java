@@ -3,6 +3,8 @@ package edu.java.services;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,7 +13,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
@@ -65,6 +70,27 @@ public class ProfileService {
 	
 	// 사진 파일 byte[] 파일로 변환
 	public byte[] imageToByteArray(String filePath) {
+		
+//		byte[] result = null;
+//		
+//		File file = new File(filePath);
+//		System.out.println("file = " + file);
+//		BufferedImage image = null;
+//		
+//		try(	FileInputStream in = new FileInputStream(file);
+//				BufferedInputStream bin = new BufferedInputStream(in);
+//				ObjectInputStream oin = new ObjectInputStream(bin);) {
+//			
+//			image = ImageIO.read(file);
+//			System.out.println("image = " + image);
+//			result = (byte[]) oin.readAllBytes();
+//		
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		}
+//		System.out.println(result);
+//		return result;
+		
 		File file = new File(filePath);
 		byte[] returnValue = null;
 		
@@ -102,6 +128,7 @@ public class ProfileService {
 		}
 		
 		return returnValue;
+		
 	}
 	
 	// byte[]를 사진 파일로 변경
@@ -109,45 +136,57 @@ public class ProfileService {
 		byte[] imageByte = proDao.selectImage(id);
 		
 		String s = "";
-		File file = new File("/images/new.png");
-		if(!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			System.out.println("파일 생성");
+		File newFolder = new File("images");
+		if(!newFolder.exists()) {
+			newFolder.mkdir();
+			System.out.println("폴더 생성");
 		}
 		
-		InputStream is = null;
-		FileOutputStream fos = null;
+		File file = new File("images", "new.png");
 		
-		try {
-			is = new ByteArrayInputStream(imageByte);
-			fos = new FileOutputStream(file);
+		try (	FileOutputStream out = new FileOutputStream(file);
+				BufferedOutputStream bout = new BufferedOutputStream(out);
+				ObjectOutputStream oout = new ObjectOutputStream(bout);) {
 			
-			int binaryRead;
-			
-			while((binaryRead = is.read()) != -1) {
-				fos.write(binaryRead);
-			}
-			
-			s = fos.toString();
-			System.out.println(s);
+			oout.write(imageByte);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if(is != null) {
-				try {
-					is.close();
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		
-		System.out.println(fos);
+		System.out.println(file);
+		
+		s = "." + file;
+		
+//		InputStream is = null;
+//		FileOutputStream fos = null;
+//		
+//		try {
+//			is = new ByteArrayInputStream(imageByte);
+//			fos = new FileOutputStream(file);
+//			
+//			int binaryRead;
+//			
+//			while((binaryRead = is.read()) != -1) {
+//				fos.write(binaryRead);
+//			}
+//			
+//			s = fos.toString();
+//			System.out.println(s);
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			if(is != null) {
+//				try {
+//					is.close();
+//				} catch(Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+//		
+//		System.out.println(fos);
 		
 //		if(imageByte == null) {
 //			return null;

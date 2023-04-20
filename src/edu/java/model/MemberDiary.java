@@ -7,6 +7,7 @@ public class MemberDiary {
 	// DB
 	public interface Entity {
 		String TBL_NAME = "MEMBER_DIARY";
+		String COL_MIDX = "MD_IDX";
 		String COL_ID = "ID";
 		String COL_TITLE = "TITLE";
 		String COL_CONTENT = "CONTENT";
@@ -15,6 +16,7 @@ public class MemberDiary {
 	}
 	
 	// fields
+	private int midx;
 	private String id;
 	private String title;
 	private String content;
@@ -24,8 +26,9 @@ public class MemberDiary {
 	// constructor
 	public MemberDiary() {}
 
-	public MemberDiary(String id, String title, String content, LocalDateTime created, LocalDateTime modified) {
+	public MemberDiary(int midx, String id, String title, String content, LocalDateTime created, LocalDateTime modified) {
 		super();
+		this.midx = midx;
 		this.id = id;
 		this.title = title;
 		this.content = content;
@@ -34,6 +37,10 @@ public class MemberDiary {
 	}
 
 	// getter & setter
+	public int getMidx() {
+		return midx;
+	}
+	
 	public String getId() {
 		return id;
 	}
@@ -77,7 +84,8 @@ public class MemberDiary {
 	// toString method
 	@Override
 	public String toString() {
-		return "MemberDiary(id =" + this.id
+		return "MemberDiary(midx = " + this.midx
+				+ ", id =" + this.id
 				+ ", title = " + this.title
 				+ ", content = " + this.content
 				+ ", created = " + this.created

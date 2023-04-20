@@ -38,4 +38,20 @@ public interface JoinUserDao {
 	 * @return String pwd
 	 */
 	String[] loginUserEqualsIdAndPwd(String id);
+
+	/**
+	 * member 등록 시 같은 번호로 가입한 사람이 있는지 확인
+	 * 
+	 * @param id
+	 * @param division
+	 * @return
+	 */
+	boolean doubleCheckMember(String id, String division);
+	
+	/**
+	 * 해당 아이디를 삭제
+	 * @param id
+	 * @return
+	 */
+	int deleteUser(String id);
 }

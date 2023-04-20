@@ -1,12 +1,11 @@
 package edu.java.model;
 
-import java.time.LocalDateTime;
-
 public class PtDiary {
 	
 	// DB
 	public interface Entity {
 		String TBL_NAME = "PT_DIARY";
+		String COL_PIDX = "PD_IDX";
 		String COL_TRID = "TR_ID";
 		String COL_MBID = "MB_ID";
 		String COL_TITLE = "TITLE";
@@ -16,29 +15,30 @@ public class PtDiary {
 	}
 	
 	// fields
+	private int pidx;
 	private String trId;
 	private String mbId;
 	private String title;
 	private String content;
-	private LocalDateTime created;
-	private LocalDateTime modified;
 	
 	
 	// constructor
 	public PtDiary() {}
 
-	public PtDiary(String trId, String mbId, String title, String content, LocalDateTime created,
-			LocalDateTime modified) {
+	public PtDiary(int pidx, String trId, String mbId, String title, String content) {
 		super();
+		this.pidx = pidx;
 		this.trId = trId;
 		this.mbId = mbId;
 		this.title = title;
 		this.content = content;
-		this.created = created;
-		this.modified = modified;
 	}
 
 	// getter & setter
+	public int getPidx() {
+		return pidx;
+	}
+	
 	public String getTrId() {
 		return trId;
 	}
@@ -71,31 +71,15 @@ public class PtDiary {
 		this.content = content;
 	}
 
-	public LocalDateTime getCreated() {
-		return created;
-	}
-
-	public void setCreated(LocalDateTime created) {
-		this.created = created;
-	}
-
-	public LocalDateTime getModified() {
-		return modified;
-	}
-
-	public void setModified(LocalDateTime modified) {
-		this.modified = modified;
-	}
 	
 	// toString method
 	@Override
 	public String toString() {
-		return "PtDiary(trid =" + this.trId
+		return "PtDiary(pidx = " + this.pidx
+				+ ", trid =" + this.trId
 				+ ", mbId = " + this.mbId
 				+ ", title = " + this.title
 				+ ", content = " + this.content
-				+ ", created = " + this.created
-				+ ", modified = " + this.modified
 				+ ")";
 	}
 	

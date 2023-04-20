@@ -6,6 +6,7 @@ public class Members {
 	public interface Entity {
 		String TBL_NAME = "MEMBERS";
 		String COL_ID = "ID";
+		String COL_TRAINER = "TRAINER";
 		String COL_NAME = "NAME";
 		String COL_GENDER = "GENDER";
 		String COL_BIRTH = "BIRTH";
@@ -16,6 +17,7 @@ public class Members {
 	
 	// fields
 	private String id;
+	private String trainer;
 	private String name;
 	private String gender;
 	private String birth;
@@ -26,13 +28,25 @@ public class Members {
 	// constructor
 	public Members() {}
 
-	public Members(String id, String name, String gender, String birth, String phone, int height, int weight) {
+	public Members(String id, String trainer, String name, String gender, String birth, String phone, int height, int weight) {
 		super();
 		this.id = id;
+		this.trainer = trainer;
 		this.name = name;
 		this.gender = gender;
 		this.birth = birth;
 		this.phone = phone;
+		this.height = height;
+		this.weight = weight;
+	}
+	
+	public Members(String id, String trainer, String name, String gender, String birth, int height, int weight) {
+		super();
+		this.id = id;
+		this.trainer = trainer;
+		this.name = name;
+		this.gender = gender;
+		this.birth = birth;
 		this.height = height;
 		this.weight = weight;
 	}
@@ -44,6 +58,14 @@ public class Members {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public String getTrainer() {
+		return trainer;
+	}
+
+	public void setTrainer(String trainer) {
+		this.trainer = trainer;
 	}
 
 	public String getName() {
@@ -98,6 +120,7 @@ public class Members {
 	@Override
 	public String toString() {
 		return "Member(id =" + this.id
+				+ ", trainer = " + this.trainer
 				+ ", name = " + this.name
 				+ ", gender = " + this.gender
 				+ ", birth = " + this.birth

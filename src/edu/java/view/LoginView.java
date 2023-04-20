@@ -119,6 +119,16 @@ public class LoginView {
 		btnLogin = new JButton("로그인");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(textId.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "아이디를 입력해주세요.");
+					return;
+				}
+				
+				if(textPwd.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "비밀번호를 입력해주세요.");
+					return;
+				}
+				
 				String x = service.loginUser(frame, textId.getText(), textPwd.getText());
 				
 				if(x != null) {

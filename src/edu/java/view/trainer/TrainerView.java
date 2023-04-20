@@ -7,11 +7,14 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -28,13 +31,17 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import edu.java.controller.ProfileDaoImpl;
 import edu.java.controller.TrainerDaoImpl;
+import edu.java.model.Members;
 import edu.java.model.Trainer;
 import edu.java.services.ProfileService;
+import edu.java.services.TrainerService;
 import edu.java.view.LoginView;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 
 public class TrainerView {
 
@@ -61,7 +68,7 @@ public class TrainerView {
 	// 마이페이지
 	private JPanel paneTrainerMyPage;
 	private JLabel lblImage;
-	private JButton btnImageChage;
+//	private JButton btnImageChage;
 	private JLabel showBirth;
 	private JLabel showName;
 	private JLabel lblEmail;
@@ -73,15 +80,13 @@ public class TrainerView {
 	private JLabel lblMyPageIcon;
 	private JLabel lblMyPage;
 	private JButton btnLogout;
-	private JPanel panelSearch;
-	private JTextField textSearch;
-	private JButton btnSearch;
 	
 	// dao
 	private final TrainerDaoImpl trDao = TrainerDaoImpl.getInstance();
 	
 	// service
 	ProfileService proService = new ProfileService();
+	TrainerService trService = new TrainerService();
 
 	/**
 	 * Launch the application.
@@ -107,18 +112,19 @@ public class TrainerView {
 		this.userId = id;
 		initialize();
 		readTrainerInfo();
-		readUserImage();
+//		readUserImage();
+		setTableModel();
 	}
 	
 	// 사진 파일 set
-	public void readUserImage() {
-		String file = proService.ByteArrayToimage(userId);
-		if(file != null) {
-			Image memberImg = new ImageIcon(file).getImage();
-			Image chageMemberImg = memberImg.getScaledInstance(lblImage.getWidth(), lblImage.getHeight(), Image.SCALE_SMOOTH);
-			lblImage.setIcon(new ImageIcon(chageMemberImg));
-		}
-	}
+//	public void readUserImage() {
+//		String file = proService.ByteArrayToimage(userId);
+//		if(file != null) {
+//			Image memberImg = new ImageIcon(file).getImage();
+//			Image chageMemberImg = memberImg.getScaledInstance(lblImage.getWidth(), lblImage.getHeight(), Image.SCALE_SMOOTH);
+//			lblImage.setIcon(new ImageIcon(chageMemberImg));
+//		}
+//	}
 	
 	// 마이페이지 set
 	public void readTrainerInfo() {
@@ -129,6 +135,24 @@ public class TrainerView {
 		showBirth.setText(trainer.getBirth());
 		showEmail.setText(trainer.getEmail());
 		showPhone.setText(trainer.getPhone());
+	}
+	
+	// 회원 리스트
+	public void resetTableModel() {
+		modelMember = new DefaultTableModel(null, MEMBER_COLUMN_NAMES);
+		setTableModel();
+		table.setModel(modelMember);
+	}
+	
+	// 맨 처음 화면에 보여지는 리스트
+	public void setTableModel() {
+		List<Members> list = trService.loadAllMemberList(userId);
+		System.out.println(list);
+		int count = 1;
+		for(Members m : list) {
+			Object[] row = {count++, m.getId(), m.getName(), m.getPhone()};
+			modelMember.addRow(row);
+		}
 	}
 
 	/**
@@ -147,22 +171,11 @@ public class TrainerView {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setFont(new Font("Gulim", Font.PLAIN, 12));
 		frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		
 		// 회원등록 - 회원 리스트, 회원 PT일지
 		tabbedPane.addTab("회원 관리", paneMemberManagement());
-		
-		panelSearch = new JPanel();
-		paneMemberManagement.add(panelSearch, BorderLayout.NORTH);
-		
-		textSearch = new JTextField();
-		textSearch.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		panelSearch.add(textSearch);
-		textSearch.setColumns(25);
-		
-		btnSearch = new JButton("검색");
-		btnSearch.setFont(new Font("D2Coding", Font.PLAIN, 15));
-		panelSearch.add(btnSearch);
 		
 		// 마이페이지
 		tabbedPane.addTab("마이페이지", paneTrainerMyPage());
@@ -240,22 +253,28 @@ public class TrainerView {
 		paneMemberManagement.add(scrollPane, BorderLayout.CENTER);
 		
 		table = new JTable();
-		table.setCellSelectionEnabled(true);
 		modelMember = new DefaultTableModel(null, MEMBER_COLUMN_NAMES);
 		table.setModel(modelMember);
 		table.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		scrollPane.setViewportView(table);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
 		
 		panelBtn = new JPanel();
 		paneMemberManagement.add(panelBtn, BorderLayout.EAST);
 		panelBtn.setLayout(new BoxLayout(panelBtn, BoxLayout.Y_AXIS));
 		
-		btnDownForm = new JButton("회원등록폼");
-		btnDownForm.setFont(new Font("D2Coding", Font.PLAIN, 15));
-		panelBtn.add(btnDownForm);
-		panelBtn.add(Box.createVerticalStrut(5));
+//		btnDownForm = new JButton("회원등록폼");
+//		btnDownForm.setFont(new Font("D2Coding", Font.PLAIN, 15));
+//		panelBtn.add(btnDownForm);
+//		panelBtn.add(Box.createVerticalStrut(5));
 		
 		btnCreateMember = new JButton("회원 등록");
+		btnCreateMember.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TrainerMemberInfoCreateFrame.showMemberInfoCreate(frame, TrainerView.this, userId);
+			}
+		});
 		btnCreateMember.setFont(new Font("D2Coding", Font.PLAIN, 15));
 		panelBtn.add(btnCreateMember);
 		panelBtn.add(Box.createVerticalStrut(5));
@@ -263,7 +282,22 @@ public class TrainerView {
 		btnUpdateMember = new JButton("회원 수정");
 		btnUpdateMember.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TrainerMemberInfoUpdateFrame.showMemberInfoUpdate(frame);
+				int row = table.getSelectedRow();
+				
+				if(row == -1) {
+					JOptionPane.showMessageDialog(
+							frame,
+							"수정할 행을 먼저 선택하세요.",
+							"경고",
+							JOptionPane.WARNING_MESSAGE
+					);
+					
+					return;
+				}
+				
+				String id = (String) modelMember.getValueAt(row, 1);
+				
+				TrainerMemberInfoUpdateFrame.showMemberInfoUpdate(frame, id, userId, TrainerView.this);
 			}
 		});
 		btnUpdateMember.setFont(new Font("D2Coding", Font.PLAIN, 15));
@@ -271,6 +305,11 @@ public class TrainerView {
 		panelBtn.add(Box.createVerticalStrut(5));
 		
 		btnDeleteMember = new JButton("회원 삭제");
+		btnDeleteMember.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				deleteMember();
+			}
+		});
 		btnDeleteMember.setFont(new Font("D2Coding", Font.PLAIN, 15));
 		panelBtn.add(btnDeleteMember);
 		panelBtn.add(Box.createVerticalGlue());
@@ -278,16 +317,64 @@ public class TrainerView {
 		btnPtMember = new JButton("회원 PT 일지");
 		btnPtMember.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				int row = table.getSelectedRow();
+				
+				if(row == -1) {
+					JOptionPane.showMessageDialog(
+							frame,
+							"회원을 먼저 선택하세요.",
+							"경고",
+							JOptionPane.WARNING_MESSAGE
+					);
+					
+					return;
+				}
+				
+				String id = (String) modelMember.getValueAt(row, 1);
 				frame.setVisible(false);
-				TrainerMemberPtDiaryView.showTrainerMemberPtDiary(frame);
+				TrainerMemberPtDiaryView.showTrainerMemberPtDiary(frame, userId, id);
 			}
 		});
-		btnPtMember.setFont(new Font("D2Coding", Font.PLAIN, 15));
+		btnPtMember.setFont(new Font("Dialog", Font.PLAIN, 12));
 		panelBtn.add(btnPtMember);
 		
 		return paneMemberManagement;
 	}
 	
+	private void deleteMember() {
+		// 테이블에서 선택된 행의 인덱스 찾기
+		int row = table.getSelectedRow();
+		
+		if(row == -1) {
+			JOptionPane.showMessageDialog(
+					frame,
+					"삭제할 행을 먼저 선택하세요.",
+					"경고",
+					JOptionPane.WARNING_MESSAGE
+			);
+			
+			return;
+		}
+		
+		int confirm = JOptionPane.showConfirmDialog(
+				frame,
+				"정말 삭제하시겠습니까?",
+				"삭제 확인",
+				JOptionPane.YES_NO_OPTION
+		);
+		
+		String id = (String) modelMember.getValueAt(row, 1);
+		
+		if(confirm == JOptionPane.YES_OPTION) {
+			trService.deleteMember(id);
+			modelMember.removeRow(row);
+			
+			JOptionPane.showConfirmDialog(frame, "삭제 성공");
+		}
+		
+		
+	}
+
 	// 마이페이지
 	private JPanel paneTrainerMyPage() {
 		paneTrainerMyPage = new JPanel();
@@ -305,19 +392,19 @@ public class TrainerView {
 		Image chageMemberImg = memberImg.getScaledInstance(lblImage.getWidth(), lblImage.getHeight(), Image.SCALE_SMOOTH);
 		lblImage.setIcon(new ImageIcon(chageMemberImg));
 		
-		btnImageChage = new JButton("이미지 변경");
-		btnImageChage.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String filePath = proService.OpenActionFolder(frame, userId);
-				Image memberImg = new ImageIcon(filePath).getImage();
-				Image chageMemberImg = memberImg.getScaledInstance(lblImage.getWidth(), lblImage.getHeight(), Image.SCALE_SMOOTH);
-				lblImage.setIcon(new ImageIcon(chageMemberImg));
-			}
-		});
-		btnImageChage.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		btnImageChage.setBounds(12, 274, 200, 23);
-		paneTrainerMyPage.add(btnImageChage);
+//		btnImageChage = new JButton("이미지 변경");
+//		btnImageChage.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				String filePath = proService.OpenActionFolder(frame, userId);
+//				Image memberImg = new ImageIcon(filePath).getImage();
+//				Image chageMemberImg = memberImg.getScaledInstance(lblImage.getWidth(), lblImage.getHeight(), Image.SCALE_SMOOTH);
+//				lblImage.setIcon(new ImageIcon(chageMemberImg));
+//			}
+//		});
+//		btnImageChage.setFont(new Font("D2Coding", Font.PLAIN, 17));
+//		btnImageChage.setBounds(12, 274, 200, 23);
+//		paneTrainerMyPage.add(btnImageChage);
 		
 		showName = new JLabel("홍익인간");
 		showName.setFont(new Font("D2Coding", Font.PLAIN, 17));
@@ -338,55 +425,4 @@ public class TrainerView {
 		return paneTrainerMyPage;
 	}
 	
-	// 사진 파일 올리기
-	class OpenActionListener implements ActionListener {
-		
-		private JFileChooser chooser;
-		
-		public OpenActionListener() {
-			// 파일 다이얼로그 생성
-			chooser = new JFileChooser();
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			FileNameExtensionFilter filter = new FileNameExtensionFilter(
-					"JPG & PNG Images",		// 파일 이름난에 출력될 문자열
-					"jpg", "png");			// 파일 필터로 사용되는 확장자. *.jpg, *.png만 나열됨.
-			
-			// 파일 다이얼로그에 파일 필터 설정
-			chooser.setFileFilter(filter);
-			// 파일 다이얼로그 출력
-			int ret = chooser.showOpenDialog(null);
-			if(ret != JFileChooser.APPROVE_OPTION) {
-				// 사용자가 창을 강제로 닫았거나 취소버튼을 누른 경우
-				JOptionPane.showMessageDialog(
-						frame,
-						"파일을 선택하지 않았습니다.",
-						"경고",
-						JOptionPane.WARNING_MESSAGE);
-				
-				return;
-			}
-			
-			// 사용자가 파일을 선택하고 "열기" 버튼을 누른 경우
-			String filePath = chooser.getSelectedFile().getPath();	// 파일 경로명 리턴
-			
-			BufferedImage image = null;
-			try {
-				File imageFile = new File(filePath);
-				image = ImageIO.read(imageFile);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			
-			// TODO
-			
-			ImageIcon icon = new ImageIcon(filePath);
-			Image img = icon.getImage();
-			Image chageImg = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-			lblImage.setIcon(new ImageIcon(chageImg));	// 이미지 출력
-		}
-	
-	}
 }
