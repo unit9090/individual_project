@@ -5,8 +5,6 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,46 +15,42 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
 
 import edu.java.model.MemberDiary;
 import edu.java.model.PtDiary;
 import edu.java.services.MemberDiaryService;
 import net.miginfocom.swing.MigLayout;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormSpecs;
-import com.jgoodies.forms.layout.RowSpec;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.BoxLayout;
+import java.awt.CardLayout;
 
-public class MemberDiaryCreateFrame extends JFrame {
+public class MemberDiaryContentFrame extends JFrame {
 
 	private JPanel contentPane;
 	private Component parent;
 	
-	private JLabel lblImage;
-	private JLabel showName;
-	private JLabel showGender;
-	private JLabel showPhone;
 	private JTextField textTitle;
 	private JTextArea textContents;
-	private JButton btnCreate;
 	
-	private String mbId;
-	private MemberView app;
+	private int idx;
 	
 	private final MemberDiaryService mdService = new MemberDiaryService();
 	
 	/**
 	 * Launch the application.
 	 */
-	public static void showMemberDiaryCreate(Component parent, MemberView app, String mbId) {
+	public static void showMemberDiaryContent(Component parent, int idx) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MemberDiaryCreateFrame frame = new MemberDiaryCreateFrame(parent, app, mbId);
+					MemberDiaryContentFrame frame = new MemberDiaryContentFrame(parent, idx);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -68,16 +62,23 @@ public class MemberDiaryCreateFrame extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MemberDiaryCreateFrame(Component parent, MemberView app, String mbId) {
+	public MemberDiaryContentFrame(Component parent, int idx) {
 		this.parent = parent;
-		this.mbId = mbId;
-		this.app = app;
+		this.idx = idx;
 		initialize();
+		readDiary();
+	}
+	
+	private void readDiary() {
+		MemberDiary md = mdService.selectDiaryInfo(idx);
 		
+		textTitle.setText(md.getTitle());
+		String str = md.getContent().replaceAll("<br>", "\n");
+		textContents.setText(str);
 	}
 	
 	public void initialize() {
-		setTitle("글 쓰기");
+		setTitle("글 자세히 보기");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		int x = 100;	// 부모 컴포넌트가 null인 경우에 사용할 x 좌표 기본값.
@@ -95,16 +96,17 @@ public class MemberDiaryCreateFrame extends JFrame {
 		
 		JPanel panelTitle = new JPanel();
 		contentPane.add(panelTitle, BorderLayout.NORTH);
-		panelTitle.setLayout(new MigLayout("", "[47px][425px]", "[31px]"));
+		panelTitle.setLayout(new MigLayout("", "[472px]", "[31px]"));
 		
 		JLabel lblTitle = new JLabel("제목   ");
 		lblTitle.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		panelTitle.add(lblTitle, "cell 0 0,alignx left,aligny center");
+		panelTitle.add(lblTitle, "cell 0 0,alignx left,aligny top");
 		
 		textTitle = new JTextField();
-		textTitle.setColumns(40);
 		textTitle.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		panelTitle.add(textTitle, "cell 1 0,alignx center,aligny center");
+		panelTitle.add(textTitle, "cell 0 0,growx,aligny top");
+		textTitle.setColumns(40);
+		textTitle.setEditable(false);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		contentPane.add(scrollPane, BorderLayout.CENTER);
@@ -112,49 +114,12 @@ public class MemberDiaryCreateFrame extends JFrame {
 		textContents = new JTextArea();
 		textContents.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		scrollPane.setViewportView(textContents);
+		textContents.setEditable(false);
 		
 		JPanel panelBtn = new JPanel();
 		contentPane.add(panelBtn, BorderLayout.SOUTH);
 		
-		btnCreate = new JButton("등록");
-		btnCreate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				createDiary();
-			}
-		});
-		btnCreate.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		panelBtn.add(btnCreate);
 	}
 
-	private void createDiary() {
-		String title = textTitle.getText();
-		String contents = textContents.getText();
-		System.out.println(contents);
-		
-		// 등록 전 빈칸 확인
-		if(textTitle.getText().isEmpty() || textContents.getText().isEmpty()) {
-			JOptionPane.showMessageDialog(
-					contentPane,
-					"빈 칸이 있습니다. 확인해주세요.",
-					"공백 확인",
-					JOptionPane.INFORMATION_MESSAGE
-			);
-			
-			return;
-		}
-		
-		contents = contents.replaceAll("(\r\n|\r|\n|\n\r)", "<br>");
-		System.out.println(contents);
-		
-		MemberDiary mdiary = new MemberDiary(0, mbId, title, contents, null, null);
-		if(mdService.createNewDiary(contentPane, mdiary) == 1) {
-			JOptionPane.showMessageDialog(contentPane, "다이어리가 등록되었습니다.");
-			
-			app.resetTableDiary();
-			
-			dispose();
-		}
-		
-	}
 
 }

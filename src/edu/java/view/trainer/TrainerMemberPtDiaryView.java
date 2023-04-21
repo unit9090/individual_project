@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
@@ -21,12 +22,15 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import edu.java.controller.PtDiaryDaoImpl;
 import edu.java.model.PtDiary;
 import edu.java.services.PtDiaryService;
 
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 
 public class TrainerMemberPtDiaryView {
@@ -178,11 +182,37 @@ public class TrainerMemberPtDiaryView {
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 		
 		table = new JTable();
-		modelPt = new DefaultTableModel(null, PT_COLUMN_NAMES);
+		modelPt = new DefaultTableModel(null, PT_COLUMN_NAMES) {
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		table.setModel(modelPt);
 		table.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		scrollPane.setViewportView(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTable t = (JTable) e.getSource();
+				
+				if(e.getClickCount() == 2) {
+					TableModel m = t.getModel();
+					Point p = e.getPoint();
+					int i = t.rowAtPoint(p);
+					if(i >= 0) {
+						int row = t.convertColumnIndexToModel(i);
+					}
+					
+					List<PtDiary> list = ptService.loadAllPtDiary(mbId);
+					int idx = list.get(i).getPidx();
+					
+					TrainerPtDiaryContentFrame.showPtDiaryContents(frame, idx);
+					
+				}
+			}
+		});
 	}
 
 	private void deletePtDiary() {

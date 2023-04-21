@@ -9,11 +9,27 @@ import java.awt.Font;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
+
+import edu.java.model.MemberDiary;
+import edu.java.model.PtDiary;
+import edu.java.services.MemberDiaryService;
+import net.miginfocom.swing.MigLayout;
+import java.awt.CardLayout;
 
 public class MemberDiaryUpdateFrame extends JFrame {
 
@@ -28,14 +44,20 @@ public class MemberDiaryUpdateFrame extends JFrame {
 	private JTextArea textContents;
 	private JButton btnUpdate;
 	
+	private MemberView app;
+	private String mbId;
+	private int idx;
+	
+	private final MemberDiaryService mdService = new MemberDiaryService();
+	
 	/**
 	 * Launch the application.
 	 */
-	public static void showMemberDiaryUpdate(Component parent) {
+	public static void showMemberDiaryUpdate(Component parent, MemberView app, String mbId, int idx) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MemberDiaryUpdateFrame frame = new MemberDiaryUpdateFrame(parent);
+					MemberDiaryUpdateFrame frame = new MemberDiaryUpdateFrame(parent, app, mbId, idx);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -47,10 +69,21 @@ public class MemberDiaryUpdateFrame extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MemberDiaryUpdateFrame(Component parent) {
+	public MemberDiaryUpdateFrame(Component parent, MemberView app, String mbId, int idx) {
 		this.parent = parent;
+		this.app = app;
+		this.mbId = mbId;
+		this.idx = idx;
 		initialize();
+		readDiary();
+	}
+	
+	private void readDiary() {
+		MemberDiary md = mdService.selectDiaryInfo(idx);
 		
+		textTitle.setText(md.getTitle());
+		String str = md.getContent().replaceAll("<br>", "\n");
+		textContents.setText(str);
 	}
 	
 	public void initialize() {
@@ -67,34 +100,70 @@ public class MemberDiaryUpdateFrame extends JFrame {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
-		getContentPane().setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		contentPane.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panelTitle = new JPanel();
-		getContentPane().add(panelTitle, BorderLayout.NORTH);
-		panelTitle.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		contentPane.add(panelTitle, BorderLayout.NORTH);
+		panelTitle.setLayout(new MigLayout("", "[472px]", "[31px]"));
 		
 		JLabel lblTitle = new JLabel("제목   ");
 		lblTitle.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		panelTitle.add(lblTitle);
+		panelTitle.add(lblTitle, "cell 0 0,alignx left,aligny top");
 		
 		textTitle = new JTextField();
 		textTitle.setFont(new Font("D2Coding", Font.PLAIN, 17));
-		panelTitle.add(textTitle);
+		panelTitle.add(textTitle, "cell 0 0,growx,aligny top");
 		textTitle.setColumns(40);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		getContentPane().add(scrollPane, BorderLayout.CENTER);
+		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
 		textContents = new JTextArea();
 		textContents.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		scrollPane.setViewportView(textContents);
 		
 		JPanel panelBtn = new JPanel();
-		getContentPane().add(panelBtn, BorderLayout.SOUTH);
+		contentPane.add(panelBtn, BorderLayout.SOUTH);
 		
 		btnUpdate = new JButton("수정");
+		btnUpdate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateDiary();
+			}
+		});
 		btnUpdate.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		panelBtn.add(btnUpdate);
+	}
+
+	private void updateDiary() {
+		String title = textTitle.getText();
+		String contents = textContents.getText();
+		System.out.println(contents);
+		
+		// 등록 전 빈칸 확인
+		if(textTitle.getText().isEmpty() || textContents.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(
+					contentPane,
+					"빈 칸이 있습니다. 확인해주세요.",
+					"공백 확인",
+					JOptionPane.INFORMATION_MESSAGE
+			);
+			
+			return;
+		}
+		
+		contents = contents.replaceAll("(\r\n|\r|\n|\n\r)", "<br>");
+		System.out.println(contents);
+		
+		MemberDiary mdiary = new MemberDiary(idx, mbId, title, contents, null, null);
+		if(mdService.updateDiary(contentPane, mdiary) == 1) {
+			JOptionPane.showMessageDialog(contentPane, "다이어리가 수정되었습니다.");
+			
+			app.resetTableDiary();
+			
+			dispose();
+		}
 	}
 
 }

@@ -3,11 +3,16 @@ package edu.java.view.member;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Image;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import edu.java.controller.TrainerDaoImpl;
+import edu.java.model.Trainer;
 
 public class MemberTrainerInfoFrame extends JFrame {
 
@@ -20,14 +25,20 @@ public class MemberTrainerInfoFrame extends JFrame {
 	private JLabel lblEmail;
 	private JLabel showEmail;
 	
+	// 상수
+	private String trId;
+	
+	// dao
+	private final TrainerDaoImpl trDao = TrainerDaoImpl.getInstance();
+	
 	/**
 	 * Launch the application.
 	 */
-	public static void showTrainerInfoFrame(Component parent) {
+	public static void showTrainerInfoFrame(Component parent, String trId) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MemberTrainerInfoFrame frame = new MemberTrainerInfoFrame(parent);
+					MemberTrainerInfoFrame frame = new MemberTrainerInfoFrame(parent, trId);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -39,10 +50,25 @@ public class MemberTrainerInfoFrame extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MemberTrainerInfoFrame(Component parent) {
+	public MemberTrainerInfoFrame(Component parent, String trId) {
 		this.parent = parent;
+		this.trId = trId;
 		initialize();
+		readTrainerInfo();
+	}
+	
+	// 트레이너 정보 set
+	public void readTrainerInfo() {
+		Trainer trainer = trDao.selectTrainerInfo(trId);
 		
+		showName.setText(trainer.getName());		
+		showEmail.setText(trainer.getEmail());
+		showPhone.setText(trainer.getPhone());
+		if(trainer.getGender().equals("M")) {
+			showGender.setText("남자");
+		} else {
+			showGender.setText("여자");
+		}
 	}
 	
 	public void initialize() {
@@ -65,6 +91,10 @@ public class MemberTrainerInfoFrame extends JFrame {
 		lblImage = new JLabel("");
 		lblImage.setBounds(12, 20, 200, 230);
 		contentPane.add(lblImage);
+		Image iconImg = new ImageIcon("images/default_image.png").getImage();
+		Image chageIconImg = iconImg.getScaledInstance(lblImage.getWidth(), lblImage.getHeight(), Image.SCALE_SMOOTH);
+		lblImage.setIcon(new ImageIcon(chageIconImg));
+		
 		
 		JLabel lblName = new JLabel("이름");
 		lblName.setFont(new Font("D2Coding", Font.PLAIN, 17));

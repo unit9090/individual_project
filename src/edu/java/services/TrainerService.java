@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 import edu.java.controller.JoinUserDaoImpl;
 import edu.java.controller.MemberDaoImpl;
+import edu.java.controller.MemberDiaryDaoImpl;
 import edu.java.controller.PtDiaryDaoImpl;
 import edu.java.controller.TrainerDaoImpl;
 import edu.java.model.JoinUser;
@@ -17,6 +18,7 @@ public class TrainerService {
 	private final JoinUserDaoImpl juDao = JoinUserDaoImpl.getInstance();
 	private final MemberDaoImpl mbDao = MemberDaoImpl.getInstance();
 	private final PtDiaryDaoImpl ptDao = PtDiaryDaoImpl.getInstance();
+	private final MemberDiaryDaoImpl mdDao = MemberDiaryDaoImpl.getInstance();
 	
 	// 회원 등록 서비스
 	public int createNewMember(Component frame, Members member) {
@@ -101,7 +103,7 @@ public class TrainerService {
 	public void deleteMember(String id) {
 		mbDao.deleteMember(id);
 		ptDao.deleteMemberPtDiary(id);
-		// TODO: 해당 아이디로 연결된 pt일지, diary도 삭제
+		mdDao.deleteMemberDiary(id);
 		juDao.deleteUser(id);
 	}
 	

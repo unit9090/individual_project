@@ -257,7 +257,7 @@ public class PtDiaryDaoImpl implements PtDiaryDao {
 		return result;
 	}
 
-	// 선택한 pidx 삭제
+	// 해당 아이디가 삭제될 때 내용도 같이 삭제
 	private static final String SQL_DELETE_USER =
 			"DELETE FROM " + TBL_NAME + " WHERE " + COL_MBID + " = ?";
 	

@@ -6,8 +6,11 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.Box;
@@ -25,16 +28,23 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import edu.java.controller.MemberDao;
 import edu.java.controller.MemberDaoImpl;
+import edu.java.controller.MemberDiaryDaoImpl;
 import edu.java.controller.PtDiaryDaoImpl;
 import edu.java.controller.TrainerDaoImpl;
+import edu.java.model.MemberDiary;
 import edu.java.model.Members;
 import edu.java.model.PtDiary;
 import edu.java.model.Trainer;
+import edu.java.services.MemberDiaryService;
 import edu.java.services.PtDiaryService;
 import edu.java.view.LoginView;
+import edu.java.view.trainer.TrainerMemberPtDiaryView;
+import edu.java.view.trainer.TrainerPtDiaryContentFrame;
+import edu.java.view.trainer.TrainerPtDiaryUpdateFrame;
 
 public class MemberView {
 
@@ -68,7 +78,7 @@ public class MemberView {
 	
 	// 다이어리
 	// 테이블 컬럼 이름
-	private static final String[] DIARY_COLUMN_NAMES = {"날짜", "제목", "내용"};
+	private static final String[] DIARY_COLUMN_NAMES = {"NO", "제목", "내용"};
 	private DefaultTableModel modelDiary;	
 	private JButton btnAddDiary;
 	private JButton btnEditDiary;
@@ -84,12 +94,17 @@ public class MemberView {
 	
 	// dao
 	private final MemberDaoImpl mDao = MemberDaoImpl.getInstance();
+	private final MemberDiaryDaoImpl mdDao = MemberDiaryDaoImpl.getInstance();
 	private final PtDiaryDaoImpl ptDao = PtDiaryDaoImpl.getInstance();
 	private final TrainerDaoImpl trDao = TrainerDaoImpl.getInstance();
 	
 	// service
 	private final PtDiaryService ptService = new PtDiaryService();
+	private final MemberDiaryService mdService = new MemberDiaryService();
 
+	// 상수
+	private Members member;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -114,22 +129,24 @@ public class MemberView {
 		this.userId = id;
 		initialize();
 		readMemberInfo();
-		setTableModel();
+		setTablePtModel();
+		setTableDiaryModal();
 	}
 	
 	// 마이페이지 set
 	public void readMemberInfo() {
-		Members member = mDao.readSelectMemberInfo(userId);
+		member = mDao.readSelectMemberInfo(userId);
+		Trainer trainer = trDao.selectTrainerInfo(member.getTrainer());
 		
 		showID.setText(userId);
 		showName.setText(member.getName());
 		showPhone.setText(member.getPhone());
 		showBirth.setText(member.getBirth());
-		showTrainer.setText(member.getTrainer());
+		showTrainer.setText(trainer.getName());
 	}
 	
 	// Pt 일지 set
-	public void setTableModel() {
+	public void setTablePtModel() {
 		List<PtDiary> list = ptService.loadAllPtDiary(userId);
 		
 		int count = 1;
@@ -139,6 +156,25 @@ public class MemberView {
 			modelPt.addRow(row);
 		}
 		
+	}
+	
+	// 다이어리 set
+	public void setTableDiaryModal() {
+		List<MemberDiary> list = mdService.loadAllDiary(userId);
+		
+		int count = 1;
+		for(MemberDiary m : list) {
+			String str = m.getContent().replaceAll("<br>", "\n");
+			Object[] row = {count++, m.getTitle(), str};
+			modelDiary.addRow(row);
+		}
+	}
+	
+	// 다이어리 리셋
+	public void resetTableDiary() {
+		modelDiary = new DefaultTableModel(null, DIARY_COLUMN_NAMES);
+		setTableDiaryModal();
+		tableDiary.setModel(modelDiary);
 	}
 
 
@@ -188,10 +224,36 @@ public class MemberView {
 		paneDiary.add(scrollPaneDiary, BorderLayout.CENTER);
 		
 		tableDiary = new JTable();
-		modelDiary = new DefaultTableModel(null, DIARY_COLUMN_NAMES);
+		// 더블 클릭 수정 block
+		modelDiary = new DefaultTableModel(null, DIARY_COLUMN_NAMES) {
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		tableDiary.setModel(modelDiary);
 		tableDiary.setFont(new Font("D2Coding ligature", Font.PLAIN, 17));
 		scrollPaneDiary.setViewportView(tableDiary);
+		
+		tableDiary.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTable t = (JTable) e.getSource();
+				
+				if(e.getClickCount() == 2) {
+					TableModel m = t.getModel();
+					Point p = e.getPoint();
+					int i = t.rowAtPoint(p);
+					if(i >= 0) {
+						int row = t.convertColumnIndexToModel(i);
+					}
+					
+					List<MemberDiary> list = mdService.loadAllDiary(userId);
+					int idx = list.get(i).getMidx();
+					
+					MemberDiaryContentFrame.showMemberDiaryContent(frame, idx);
+				}
+			}
+		});
 		
 		panelBtnFrame = new JPanel();
 		paneDiary.add(panelBtnFrame, BorderLayout.EAST);
@@ -199,7 +261,7 @@ public class MemberView {
 		btnAddDiary = new JButton("글 쓰기");
 		btnAddDiary.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MemberDiaryCreateFrame.showMemberDiaryCreate(frame);
+				MemberDiaryCreateFrame.showMemberDiaryCreate(frame, MemberView.this, userId);
 			}
 		});
 		btnAddDiary.setFont(new Font("D2Coding", Font.PLAIN, 17));
@@ -211,7 +273,23 @@ public class MemberView {
 		btnEditDiary = new JButton("글 수정");
 		btnEditDiary.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MemberDiaryUpdateFrame.showMemberDiaryUpdate(frame);
+				int row = tableDiary.getSelectedRow();
+				
+				if(row == -1) {
+					JOptionPane.showMessageDialog(
+							frame,
+							"수정할 행을 먼저 선택하세요.",
+							"경고",
+							JOptionPane.WARNING_MESSAGE
+					);
+					
+					return;
+				}
+				
+				List<MemberDiary> list = mdService.loadAllDiary(userId);
+				int idx = list.get(row).getMidx();				
+				
+				MemberDiaryUpdateFrame.showMemberDiaryUpdate(frame, MemberView.this, userId, idx);
 			}
 		});
 		btnEditDiary.setFont(new Font("D2Coding", Font.PLAIN, 17));
@@ -221,6 +299,11 @@ public class MemberView {
 		panelBtnFrame.add(verticalStrut_1);
 		
 		btnDeleteDiary = new JButton("글 삭제");
+		btnDeleteDiary.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				deleteDiary();
+			}
+		});
 		btnDeleteDiary.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		panelBtnFrame.add(btnDeleteDiary);
 
@@ -230,6 +313,41 @@ public class MemberView {
 	}
 	
 	
+	private void deleteDiary() {
+		// 테이블에서 선택된 행의 인덱스 찾기
+		int row = tableDiary.getSelectedRow();
+		
+		if(row == -1) {
+			JOptionPane.showMessageDialog(
+					frame,
+					"삭제할 행을 먼저 선택하세요.",
+					"경고",
+					JOptionPane.WARNING_MESSAGE
+			);
+			
+			return;
+		}
+		
+		int confirm = JOptionPane.showConfirmDialog(
+				frame,
+				"정말 삭제하시겠습니까?",
+				"삭제 확인",
+				JOptionPane.YES_NO_OPTION
+		);
+		
+		List<MemberDiary> list = mdService.loadAllDiary(userId);
+		int idx = list.get(row).getMidx();
+		
+		if(confirm == JOptionPane.YES_OPTION) {
+			mdService.deleteDiary(idx);
+			modelDiary.removeRow(row);
+			
+			JOptionPane.showMessageDialog(frame, "다이어리가 삭제되었습니다.");
+		}
+		
+		
+	}
+
 	// PT 일지 Panel
 	private JPanel panePT() {
 		
@@ -257,13 +375,41 @@ public class MemberView {
 		panel.add(scrollPanePt, BorderLayout.CENTER);
 		
 		tablePt = new JTable();
-		modelPt = new DefaultTableModel(null, PT_COLUMN_NAMES);
+		// 더블 클릭 수정 block
+		modelPt = new DefaultTableModel(null, PT_COLUMN_NAMES) {
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		tablePt.setModel(modelPt);
 		tablePt.setFont(new Font("D2Coding", Font.PLAIN, 17));
 		scrollPanePt.setViewportView(tablePt);
 		
+		tablePt.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTable t = (JTable) e.getSource();
+				
+				if(e.getClickCount() == 2) {
+					TableModel m = t.getModel();
+					Point p = e.getPoint();
+					int i = t.rowAtPoint(p);
+					if(i >= 0) {
+						int row = t.convertColumnIndexToModel(i);
+					}
+					
+					List<PtDiary> list = ptService.loadAllPtDiary(userId);
+					int idx = list.get(i).getPidx();
+					
+					TrainerPtDiaryContentFrame.showPtDiaryContents(frame, idx);
+					
+				}
+			}
+		});
+		
 		return panePT;
 	}
+	
 	
 	// 마이페이지 Panel
 	private JPanel paneMyPage() {
@@ -339,7 +485,7 @@ public class MemberView {
 		btnshowTrainer = new JButton("트레이너 정보보기");
 		btnshowTrainer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MemberTrainerInfoFrame.showTrainerInfoFrame(frame);
+				MemberTrainerInfoFrame.showTrainerInfoFrame(frame, member.getTrainer());
 			}
 		});
 		btnshowTrainer.setFont(new Font("D2Coding", Font.PLAIN, 17));
