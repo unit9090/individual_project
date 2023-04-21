@@ -19,7 +19,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import edu.java.controller.MemberDaoImpl;
 import edu.java.model.Members;
 import edu.java.services.TextFilter;
 import edu.java.services.TrainerService;
@@ -245,7 +244,6 @@ public class TrainerMemberInfoUpdateFrame extends JFrame {
 		if(trService.updateMember(contentPane, member) == 1) {
 			JOptionPane.showMessageDialog(contentPane, "회원이 수정되었습니다.");
 			
-			// TODO: 테이블 리셋
 			app.resetTableModel();
 			
 			dispose();

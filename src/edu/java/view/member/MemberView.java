@@ -3,7 +3,6 @@ package edu.java.view.member;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Point;
@@ -17,7 +16,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -25,15 +23,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import edu.java.controller.MemberDao;
 import edu.java.controller.MemberDaoImpl;
-import edu.java.controller.MemberDiaryDaoImpl;
-import edu.java.controller.PtDiaryDaoImpl;
 import edu.java.controller.TrainerDaoImpl;
 import edu.java.model.MemberDiary;
 import edu.java.model.Members;
@@ -42,9 +35,7 @@ import edu.java.model.Trainer;
 import edu.java.services.MemberDiaryService;
 import edu.java.services.PtDiaryService;
 import edu.java.view.LoginView;
-import edu.java.view.trainer.TrainerMemberPtDiaryView;
 import edu.java.view.trainer.TrainerPtDiaryContentFrame;
-import edu.java.view.trainer.TrainerPtDiaryUpdateFrame;
 
 public class MemberView {
 
@@ -59,7 +50,6 @@ public class MemberView {
 
 	// 마이페이지	
 	private JLabel lblImage;
-	private JButton btnImageChage;
 	private JLabel showName;
 	private JLabel showBirth;
 	private JLabel showID;
@@ -94,8 +84,6 @@ public class MemberView {
 	
 	// dao
 	private final MemberDaoImpl mDao = MemberDaoImpl.getInstance();
-	private final MemberDiaryDaoImpl mdDao = MemberDiaryDaoImpl.getInstance();
-	private final PtDiaryDaoImpl ptDao = PtDiaryDaoImpl.getInstance();
 	private final TrainerDaoImpl trDao = TrainerDaoImpl.getInstance();
 	
 	// service
@@ -240,12 +228,8 @@ public class MemberView {
 				JTable t = (JTable) e.getSource();
 				
 				if(e.getClickCount() == 2) {
-					TableModel m = t.getModel();
 					Point p = e.getPoint();
 					int i = t.rowAtPoint(p);
-					if(i >= 0) {
-						int row = t.convertColumnIndexToModel(i);
-					}
 					
 					List<MemberDiary> list = mdService.loadAllDiary(userId);
 					int idx = list.get(i).getMidx();
@@ -391,12 +375,8 @@ public class MemberView {
 				JTable t = (JTable) e.getSource();
 				
 				if(e.getClickCount() == 2) {
-					TableModel m = t.getModel();
 					Point p = e.getPoint();
 					int i = t.rowAtPoint(p);
-					if(i >= 0) {
-						int row = t.convertColumnIndexToModel(i);
-					}
 					
 					List<PtDiary> list = ptService.loadAllPtDiary(userId);
 					int idx = list.get(i).getPidx();

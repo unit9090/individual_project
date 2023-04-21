@@ -4,6 +4,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -19,12 +23,6 @@ import edu.java.model.Members;
 import edu.java.services.JoinViewService;
 import edu.java.services.TextFilter;
 import edu.java.services.TrainerService;
-
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.awt.event.ActionEvent;
 
 public class TrainerMemberInfoCreateFrame extends JFrame {
 
@@ -251,7 +249,6 @@ public class TrainerMemberInfoCreateFrame extends JFrame {
 		if(trService.createNewMember(contentPane, member) == 1) {
 			JOptionPane.showMessageDialog(contentPane, "회원이 등록되었습니다.");
 			
-			// TODO: 테이블 리셋
 			app.resetTableModel();
 			
 			dispose();

@@ -6,6 +6,10 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
@@ -14,12 +18,10 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -27,11 +29,6 @@ import javax.swing.table.TableModel;
 import edu.java.controller.PtDiaryDaoImpl;
 import edu.java.model.PtDiary;
 import edu.java.services.PtDiaryService;
-
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
 
 public class TrainerMemberPtDiaryView {
 
@@ -198,12 +195,8 @@ public class TrainerMemberPtDiaryView {
 				JTable t = (JTable) e.getSource();
 				
 				if(e.getClickCount() == 2) {
-					TableModel m = t.getModel();
 					Point p = e.getPoint();
 					int i = t.rowAtPoint(p);
-					if(i >= 0) {
-						int row = t.convertColumnIndexToModel(i);
-					}
 					
 					List<PtDiary> list = ptService.loadAllPtDiary(mbId);
 					int idx = list.get(i).getPidx();

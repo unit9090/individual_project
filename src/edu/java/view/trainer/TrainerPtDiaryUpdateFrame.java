@@ -3,8 +3,9 @@ package edu.java.view.trainer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,8 +20,6 @@ import javax.swing.border.EmptyBorder;
 import edu.java.model.PtDiary;
 import edu.java.services.PtDiaryService;
 import net.miginfocom.swing.MigLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class TrainerPtDiaryUpdateFrame extends JFrame {
 
